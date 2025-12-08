@@ -3,8 +3,16 @@ const { MIDIEvent } = pkg;
 import RNBODevice from './RNBODevice'
 import type { Dictionary } from '../types'
 
-const patcher = fetch(new URL('./json/reverb-gen.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/reverb-gen.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 
 /**
  * The Reverb chained to the end of each stream. Is initialised only when reverb parameter is greater than 0.
@@ -16,7 +24,7 @@ class ReverbGen extends RNBODevice {
     constructor() {
         super()
         this.defaults = { reverb: 0, rsize: 0.25, rdamp: 0.5, rtime: 0.25, rspread: 0.1, rwidth: 0.1, rearly: 0.01, rtail: 0.01 }
-        this.patcher = patcher
+        this.patcher = getPatcher()
         this.initDevice()
 
         this.reverb = this.reverb.bind(this)

@@ -3,8 +3,16 @@ import pkg from '@rnbo/js';
 const { MIDIEvent } = pkg;
 import type { Dictionary } from '../types'
 
-const patcher = fetch(new URL('./json/fx-delay.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/fx-delay.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 
 /**
  * The delay chained to the end of each stream. Is initialised only when delay parameter is greater than 0.
@@ -16,7 +24,7 @@ class FXDelay extends RNBODevice {
     constructor() {
         super()
         this.defaults = { delay: 0, dtime: 500, dfb: 0.5, dspread: 0, dcolour: 0.5, dfilter: 0 }
-        this.patcher = patcher
+        this.patcher = getPatcher()
         this.initDevice()
 
         this.delay = this.delay.bind(this)

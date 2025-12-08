@@ -2,8 +2,16 @@ import BaseSamplingDevice from "./BaseSamplingDevice";
 
 // the same as Granular.ts except we supply snap as a target time value, removing the need for bpm calculations
 
-const patcher = fetch(new URL('./json/granular2.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/granular2.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 /**
  * Granular Synth
  * @example
@@ -31,7 +39,7 @@ class Granular extends BaseSamplingDevice {
             begin: 0,
             end: 1,
         }
-        this.patcher = patcher
+        this.patcher = getPatcher()
         this.initDevice()
 
         this.snap = this.snap.bind(this)

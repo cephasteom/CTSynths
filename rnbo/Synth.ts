@@ -1,9 +1,15 @@
 import BaseSynth from "./BaseSynth";
 
-const patcher = fetch(new URL('./json/synth.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
-const patcherLite = fetch(new URL('./json/synth-lite.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/synth-lite.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 
 /**
  * An all purpose synth with filters and FM
@@ -12,12 +18,10 @@ const patcherLite = fetch(new URL('./json/synth-lite.export.json', import.meta.u
  */ 
 class Synth extends BaseSynth {
     /** @hidden */
-    constructor(args: any = {}) {
+    constructor() {
         super()
         this.defaults = { ...this.defaults, osc: 0, drift: 0, modi: 0, harm: 1, lforate: 0, lfodepth: 0 }
-        this.patcher = args.lite 
-            ? patcherLite
-            : patcher
+        this.patcher = getPatcher()
 
         this.initDevice()
         

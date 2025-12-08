@@ -3,8 +3,16 @@ const { MIDIEvent } = pkg;
 import RNBODevice from './RNBODevice'
 import type { Dictionary } from '../types'
 
-const patcher = fetch(new URL('./json/fx-channel2.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/fx-channel2.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 
 /**
  * The chain of effect applied to the output of each stream. Each effect remains inactive until the amount is set to a value greater than 0.
@@ -19,7 +27,7 @@ class FXChannel extends RNBODevice {
             dist: 0, drive: 0.25,
             lpf: 0, hpf: 0,
         }
-        this.patcher = patcher
+        this.patcher = getPatcher()
         this.initDevice()
 
         this.dist = this.dist.bind(this)

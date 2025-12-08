@@ -1,7 +1,15 @@
 import BaseSamplingDevice from "./BaseSamplingDevice";
 
-const patcher = fetch(new URL('./json/sampler2.export.json', import.meta.url))
-    .then(rawPatcher => rawPatcher.json())
+let patcherPromise: Promise<any> | null = null;
+
+function getPatcher() {
+    if (!patcherPromise) {
+        patcherPromise = fetch(
+            new URL('./json/sampler2.export.json', import.meta.url)
+        ).then(r => r.json());
+    }
+    return patcherPromise;
+}
 
 // the same as Sampler.ts except we supply snap as a target time value, removing the need for bpm calculations
 
@@ -19,7 +27,7 @@ class Sampler extends BaseSamplingDevice {
             ...this.defaults, 
             i: 0, snap: 0, rate: 1, a: 5, d: 10, s: 1, r: 100, begin: 0, end: 1, loop: 0, oneshot: 0, loopsize: 1
         }
-        this.patcher = patcher
+        this.patcher = getPatcher()
         this.initDevice()
 
         this.snap = this.snap.bind(this)
