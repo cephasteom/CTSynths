@@ -20,7 +20,7 @@ class Synth extends BaseSynth {
     /** @hidden */
     constructor() {
         super()
-        this.defaults = { ...this.defaults, osc: 0, drift: 0, modi: 0, harm: 1, lforate: 0, lfodepth: 0 }
+        this.defaults = { ...this.defaults, osc: 0, drift: 0, modi: 0, harm: 1, lforate: 0, lfodepth: 0, lfotype: 0 }
         this.patcher = getPatcher()
 
         this.initDevice()
@@ -37,6 +37,7 @@ class Synth extends BaseSynth {
         this._lforate = this._lforate.bind(this)
         this.lfodepth = this.lfodepth.bind(this)
         this._lfodepth = this._lfodepth.bind(this)
+        this.lfotype = this.lfotype.bind(this)
             
         this.params = Object.getOwnPropertyNames(this)
     }
@@ -115,6 +116,12 @@ class Synth extends BaseSynth {
      * @param value - LFO depth, 0 to 1
      */
     _lfodepth(value: number = 0, time: number): void { this.messageDevice('_lfodepth', value, time) }
+
+    /**
+     * LFO waveform type. sine, ramp, square, pulse, tri
+     * @param value - 0 to 4
+     */ 
+    lfotype(value: number = 0, time: number): void { this.messageDevice('lfotype', value, time) }
 }
 
 export default Synth
