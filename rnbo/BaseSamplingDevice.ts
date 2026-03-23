@@ -39,6 +39,7 @@ class BaseSamplingDevice extends BaseSynth {
      */
     async loadSample(bank: string, index: number) {
         if(!this.ready) return
+        index = Math.floor(index)
         const url = this.banks[bank][index]
 
         // check if the sample is already loaded into a buffer
