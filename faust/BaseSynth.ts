@@ -64,28 +64,33 @@ class BaseSynth extends FaustDevice {
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur, hold } = ps;
 
-        this.setParams(ps, time);
-
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + (nudge || 0) + 10;
-
-        // cancel any pending auto-release for this note before re-triggering
         const existing = this._releaseTimers.get(n);
         if (existing !== undefined) {
             clearTimeout(existing);
             this._releaseTimers.delete(n);
         }
 
+        const paramDelay = Math.max(0, (time - this.context.currentTime) * 1000);
+        const noteDelay = paramDelay + (nudge || 0) + 10;
+
+        setTimeout(() => {
+            Object.entries(ps)
+                .sort(([a], [b]) => a.localeCompare(b))
+                .filter(([key]) => !!this.paramPath(key))
+                .forEach(([key, value]) => this.setParamValue(key, value));
+        }, paramDelay);
+
         setTimeout(() => {
             this._activeNotes.add(n);
             this.node.keyOn(0, n, Math.round(amp * 127));
-        }, delay);
+        }, noteDelay);
 
         if (!hold) {
             const id = setTimeout(() => {
                 this.node.keyOff(0, n, 0);
                 this._activeNotes.delete(n);
                 this._releaseTimers.delete(n);
-            }, delay + dur);
+            }, noteDelay + dur);
             this._releaseTimers.set(n, id);
         }
     }

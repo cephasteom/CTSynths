@@ -9,11 +9,11 @@ export const meta = {
     "library_list": [
         "/usr/share/faust/stdfaust.lib",
         "/usr/share/faust/oscillators.lib",
-        "/usr/share/faust/platform.lib",
+        "/usr/share/faust/signals.lib",
         "/usr/share/faust/maths.lib",
+        "/usr/share/faust/platform.lib",
         "/usr/share/faust/basics.lib",
-        "/usr/share/faust/envelopes.lib",
-        "/usr/share/faust/signals.lib"
+        "/usr/share/faust/envelopes.lib"
     ],
     "include_pathnames": [
         "/faust/user/inc0",
@@ -22,8 +22,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262292,
-    "code": "CFPU",
+    "size": 262268,
+    "code": "GITS",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -117,7 +117,7 @@ export const meta = {
                     "varname": "fHslider6",
                     "shortname": "d",
                     "address": "/SimpleSynth/d",
-                    "index": 262244,
+                    "index": 262236,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -129,7 +129,7 @@ export const meta = {
                     "varname": "fHslider3",
                     "shortname": "freq",
                     "address": "/SimpleSynth/freq",
-                    "index": 262188,
+                    "index": 262200,
                     "init": 440,
                     "min": 20,
                     "max": 20000,
@@ -153,7 +153,7 @@ export const meta = {
                     "varname": "fButton0",
                     "shortname": "gate",
                     "address": "/SimpleSynth/gate",
-                    "index": 262200
+                    "index": 262152
                 },
                 {
                     "type": "hslider",
@@ -161,7 +161,7 @@ export const meta = {
                     "varname": "fHslider2",
                     "shortname": "lagtime",
                     "address": "/SimpleSynth/lagtime",
-                    "index": 262164,
+                    "index": 262184,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -173,7 +173,7 @@ export const meta = {
                     "varname": "fHslider7",
                     "shortname": "r",
                     "address": "/SimpleSynth/r",
-                    "index": 262264,
+                    "index": 262240,
                     "init": 500,
                     "min": 0,
                     "max": 10000,

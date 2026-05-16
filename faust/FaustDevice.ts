@@ -87,7 +87,10 @@ class FaustDevice {
 
     messageDevice(tag: string, value: number, time: number) {
         const delay = Math.max(0, (time - this.context.currentTime) * 1000);
-        setTimeout(() => this.setParamValue(tag, value), delay);
+        this.setParamValue('lagtime', 10);
+        setTimeout(() => {
+            this.setParamValue(tag, value)
+        }, delay);
     }
 
     connect(node: typeof Destination | Gain) {
@@ -112,16 +115,16 @@ class FaustDevice {
         if (!this.ready) return;
         const { nudge } = params;
         const delay = Math.max(0, (time - this.context.currentTime) * 1000) + (nudge || 0);
-        const entries = Object.entries(params).filter(([k]) => k !== 'nudge');
+        const entries = Object.entries(params)
+            .filter(([k]) => k !== 'nudge')
+            .map(([key, value]): [string, number] =>
+                key === 'n' ? ['freq', 440 * Math.pow(2, (value - 69) / 12)] : [key, value]
+            );
 
         setTimeout(() => {
-            // raise lagtime so the DSP ramps each param via si.lag
             this.setParamValue('lagtime', lag);
             entries.forEach(([key, value]) => this.setParamValue(key, value));
         }, delay);
-
-        // reset lagtime to 0 so subsequent direct setParam calls remain instant
-        setTimeout(() => this.setParamValue('lagtime', 0), delay + lag + 16);
     }
 }
 
