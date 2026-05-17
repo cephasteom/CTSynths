@@ -45,7 +45,7 @@ modEnv  = en.adsr(moda, modd, mods, modr, gate);
 env     = en.adsr(a, d, s, r, gate);
 
 // --- FM core ---
-modSig  = os.osc(freq * harm) * freq * modIdx * modEnv;
+modSig  = os.osc(freq * varlag(harm)) * freq * modIdx * modEnv;
 car     = os.oscrc(freq + modSig);     // os.oscrc resets phase on note-on
 
 // --- Amplitude & pan ---
