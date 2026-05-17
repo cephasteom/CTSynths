@@ -1,0 +1,11 @@
+{
+  "name": "@cephasteom/ct-synths",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "compile": "node faust/compile.mjs"
+  },
+  "dependencies": {
+    "@grame/faustwasm": "^0.16.1"
+  }
+}
