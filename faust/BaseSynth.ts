@@ -7,7 +7,6 @@ import type { Dictionary } from '../types';
  */
 class BaseSynth extends FaustDevice {
     private _releaseTimers = new Map<Symbol, ReturnType<typeof setTimeout>>()
-    private _activeNotes = new Set<number>()
 
     defaults: Dictionary = {
         dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1, hold: 0,
@@ -77,11 +76,10 @@ class BaseSynth extends FaustDevice {
         }, paramDelay);
 
         setTimeout(() => {
-            this._activeNotes.add(n);
+            this.node.keyOff(0, n, 0); // silence any that are already playing
             this.node.keyOn(0, n, Math.round(amp * 127));
             const id = setTimeout(() => {
                 this.node.keyOff(0, n, 0);
-                this._activeNotes.delete(n);
                 this._releaseTimers.delete(eventId);
             }, dur);
             this._releaseTimers.set(eventId, id);
@@ -92,13 +90,13 @@ class BaseSynth extends FaustDevice {
         if (!this.ready) return;
         const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
 
-        const notes = [...this._activeNotes];
-        this._activeNotes.clear();
         this._releaseTimers.forEach(id => clearTimeout(id));
         this._releaseTimers.clear();
         setTimeout(() => {
             this.setParamValue('r', ms);
-            notes.forEach(n => this.node.keyOff(0, n, 0));
+            for (let i = 0; i < 128; i++) {
+                this.node.keyOff(0, i, 0);
+            }
         }, delay);
     }
 
