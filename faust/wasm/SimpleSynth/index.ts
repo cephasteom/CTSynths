@@ -22,8 +22,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262268,
-    "code": "GITS",
+    "size": 262280,
+    "code": "UC7U",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -166,6 +166,18 @@ export const meta = {
                     "min": 0,
                     "max": 10000,
                     "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "pan",
+                    "varname": "fHslider8",
+                    "shortname": "pan",
+                    "address": "/SimpleSynth/pan",
+                    "index": 262252,
+                    "init": 0.5,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
                 },
                 {
                     "type": "hslider",

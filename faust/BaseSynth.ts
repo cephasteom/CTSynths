@@ -74,6 +74,7 @@ class BaseSynth extends FaustDevice {
         const noteDelay = paramDelay + (nudge || 0) + 10;
 
         setTimeout(() => {
+            console.log('set params')
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key))
@@ -81,6 +82,7 @@ class BaseSynth extends FaustDevice {
         }, paramDelay);
 
         setTimeout(() => {
+            console.log('play')
             this._activeNotes.add(n);
             this.node.keyOn(0, n, Math.round(amp * 127));
         }, noteDelay);
@@ -109,6 +111,7 @@ class BaseSynth extends FaustDevice {
         this._activeNotes.clear();
         const delay = Math.max(0, (time - this.context.currentTime) * 1000);
         setTimeout(() => {
+            console.log('cut', ms)
             this.setParamValue('r', ms);
             notes.forEach(n => this.node.keyOff(0, n, 0));
         }, delay);
