@@ -1,27 +1,20 @@
 import FaustDevice from './FaustDevice';
 import type { Dictionary } from '../types';
 
-interface ScheduledEvent {
-    time: number;
-    fn: () => void;
-}
-
 /**
  * Base class for all Faust polyphonic synths. Mirrors the rnbo/BaseSynth API.
  * Do not instantiate directly.
  */
 class BaseSynth extends FaustDevice {
-    private _scheduledEvents: ScheduledEvent[] = [];
-    private _schedulerHandle: number | null = null;
-    private _releaseEvents = new Map<number, ScheduledEvent>();
-    private _activeNotes = new Map<number, number>(); // note → scheduled keyOn time
-
-    private readonly LOOKAHEAD = 0.05;  // 50ms lookahead window
-    private readonly IMMEDIATE = 0.005; // fire immediately if within 5ms
+    private _releaseTimers = new Map<number, ReturnType<typeof setTimeout>>()
+    private _activeNotes = new Set<number>()
 
     defaults: Dictionary = {
-        dur: 1000, n: 60, pan: 0.5, vol: 1, amp: .75,
+        dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1, hold: 0,
         a: 10, d: 100, s: 0.8, r: 500,
+        moda: 10, modd: 100, mods: 0.8, modr: 500,
+        fila: 10, fild: 100, fils: 0.8, filr: 500,
+        res: 0, cutoff: 20000, detune: 0,
     }
 
     constructor() {
@@ -35,132 +28,91 @@ class BaseSynth extends FaustDevice {
         this._vol = this._vol.bind(this);
         this.amp = this.amp.bind(this);
         this._amp = this._amp.bind(this);
+        this.hold = this.hold.bind(this);
         this.a = this.a.bind(this);
+        this.acurve = this.acurve.bind(this);
         this.d = this.d.bind(this);
+        this.dcurve = this.dcurve.bind(this);
         this.s = this.s.bind(this);
         this.r = this.r.bind(this);
+        this.rcurve = this.rcurve.bind(this);
+        this.moda = this.moda.bind(this);
+        this.modacurve = this.modacurve.bind(this);
+        this.modd = this.modd.bind(this);
+        this.moddcurve = this.moddcurve.bind(this);
+        this.mods = this.mods.bind(this);
+        this.modr = this.modr.bind(this);
+        this.modrcurve = this.modrcurve.bind(this);
+        this.fila = this.fila.bind(this);
+        this.filacurve = this.filacurve.bind(this);
+        this.fild = this.fild.bind(this);
+        this.fildcurve = this.fildcurve.bind(this);
+        this.fils = this.fils.bind(this);
+        this.filr = this.filr.bind(this);
+        this.filrcurve = this.filrcurve.bind(this);
+        this.res = this.res.bind(this);
+        this._res = this._res.bind(this);
+        this.cutoff = this.cutoff.bind(this);
+        this._cutoff = this._cutoff.bind(this);
+        this.detune = this.detune.bind(this);
+        this._detune = this._detune.bind(this);
     }
-
-    // -------------------------------------------------------------------------
-    // Scheduler
-    // -------------------------------------------------------------------------
-
-    private _startScheduler(): void {
-        if (this._schedulerHandle !== null) return;
-        const tick = () => {
-            const now = this.context.currentTime;
-            this._scheduledEvents = this._scheduledEvents.filter(ev => {
-                if (ev.time <= now + this.LOOKAHEAD) {
-                    ev.fn();
-                    return false;
-                }
-                return true;
-            });
-            if (this._scheduledEvents.length > 0) {
-                this._schedulerHandle = requestAnimationFrame(tick);
-            } else {
-                this._schedulerHandle = null;
-            }
-        };
-        this._schedulerHandle = requestAnimationFrame(tick);
-    }
-
-    private _schedule(time: number, fn: () => void): ScheduledEvent {
-        if (time <= this.context.currentTime + this.IMMEDIATE) {
-            fn();
-            return { time, fn };
-        }
-        const ev: ScheduledEvent = { time, fn };
-        this._scheduledEvents.push(ev);
-        this._scheduledEvents.sort((a, b) => a.time - b.time);
-        this._startScheduler();
-        return ev;
-    }
-
-    private _cancel(ev: ScheduledEvent): void {
-        const idx = this._scheduledEvents.indexOf(ev);
-        if (idx !== -1) this._scheduledEvents.splice(idx, 1);
-    }
-
-    // -------------------------------------------------------------------------
-    // Playback
-    // -------------------------------------------------------------------------
 
     play(params: Dictionary = {}, time: number): void {
         if (!this.ready) return;
-        console.log('play method')
 
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur } = ps;
 
-        // Cancel any pending release for this note
-        const existingRelease = this._releaseEvents.get(n);
-        if (existingRelease !== undefined) {
-            this._cancel(existingRelease);
-            this._releaseEvents.delete(n);
+        const existing = this._releaseTimers.get(n);
+        if (existing !== undefined) {
+            clearTimeout(existing);
+            this._releaseTimers.delete(n);
         }
 
-        const paramTime = time;
-        const noteTime = time + ((nudge || 0) + 10) / 1000;
-        const releaseTime = noteTime + dur / 1000;
+        const paramDelay = Math.max(0, (time - this.context.currentTime) * 1000);
+        const noteDelay = paramDelay + (nudge || 0) + 10;
 
-        this._schedule(paramTime, () => {
-            console.log('param timer')
+        setTimeout(() => {
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key))
                 .forEach(([key, value]) => this.setParamValue(key, value));
-        });
+        }, paramDelay);
 
-        // Track at schedule time so cut() knows about pending notes
-        this._activeNotes.set(n, noteTime);
-
-        this._schedule(noteTime, () => {
-            console.log('note on timer')
+        setTimeout(() => {
+            this._activeNotes.add(n);
             this.node.keyOn(0, n, Math.round(amp * 127));
-        });
-        const releaseEv = this._schedule(releaseTime, () => {
-            console.log('note off timer')
-            this.node.keyOff(0, n, 0);
-            this._activeNotes.delete(n);
-            this._releaseEvents.delete(n);
-        });
-        this._releaseEvents.set(n, releaseEv);
+            const id = setTimeout(() => {
+                this.node.keyOff(0, n, 0);
+                this._activeNotes.delete(n);
+                this._releaseTimers.delete(n);
+            }, dur);
+            this._releaseTimers.set(n, id);
+        }, noteDelay);
 
     }
 
     release(n: number, time: number): void {
         if (!this.ready) return;
-        this._schedule(time + 0.01, () => this.node.keyOff(0, n, 0));
+        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 10;
+        setTimeout(() => this.node.keyOff(0, n, 0), delay);
     }
 
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
-
-        // Split notes into ones to cut now vs ones scheduled in the future
-        const notesToCut = [...this._activeNotes.entries()]
-            .filter(([_, keyOnTime]) => keyOnTime <= time);
-
-        notesToCut.forEach(([n, keyOnTime]) => {
-            // Only cancel releases for notes we're actually cutting
-            const releaseEv = this._releaseEvents.get(n);
-            if (releaseEv) {
-                this._cancel(releaseEv);
-                this._releaseEvents.delete(n);
-            }
-            this._activeNotes.delete(n);
-            
-            const cutTime = Math.max(time, keyOnTime) + 0.001;
-            this._schedule(cutTime, () => {
-                this.setParamValue('r', ms);
-                this.node.keyOff(0, n, 0);
-            });
-        });
-    }   
-
-    // -------------------------------------------------------------------------
-    // Parameter methods
-    // -------------------------------------------------------------------------
+        // delay cut timer by 1 ms so that it happens after the param timer
+        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
+        
+        const notes = [...this._activeNotes];
+        this._activeNotes.clear();
+        this._releaseTimers.forEach(id => clearTimeout(id));
+        this._releaseTimers.clear();
+        setTimeout(() => {
+            this.setParamValue('r', ms);
+            notes.forEach(n => this.node.keyOff(0, n, 0));
+        }, delay);
+    }
 
     dur(value: number = 1000, time: number): void { this.messageDevice('dur', value, time); }
     n(value: number = 60, time: number): void { this.messageDevice('n', value, time); }
@@ -172,10 +124,34 @@ class BaseSynth extends FaustDevice {
     _amp(value: number = 1, time: number): void { this.messageDevice('_amp', value, time); }
     vol(value: number = 1, time: number): void { this.messageDevice('vol', value, time); }
     _vol(value: number = 1, time: number): void { this.messageDevice('_vol', value, time); }
+    hold(value: number, time: number): void { this.messageDevice('hold', value, time); }
     a(value: number = 10, time: number): void { this.messageDevice('a', value, time); }
     d(value: number = 100, time: number): void { this.messageDevice('d', value, time); }
     s(value: number = 0.5, time: number): void { this.messageDevice('s', value, time); }
     r(value: number = 1000, time: number): void { this.messageDevice('r', value, time); }
+    acurve(value: number, time: number): void { this.messageDevice('acurve', value, time); }
+    dcurve(value: number, time: number): void { this.messageDevice('dcurve', value, time); }
+    rcurve(value: number, time: number): void { this.messageDevice('rcurve', value, time); }
+    moda(value: number = 10, time: number): void { this.messageDevice('moda', value, time); }
+    modd(value: number = 100, time: number): void { this.messageDevice('modd', value, time); }
+    mods(value: number = 0.8, time: number): void { this.messageDevice('mods', value, time); }
+    modr(value: number = 1000, time: number): void { this.messageDevice('modr', value, time); }
+    modacurve(value: number, time: number): void { this.messageDevice('modacurve', value, time); }
+    moddcurve(value: number, time: number): void { this.messageDevice('moddcurve', value, time); }
+    modrcurve(value: number, time: number): void { this.messageDevice('modrcurve', value, time); }
+    fila(value: number = 10, time: number): void { this.messageDevice('fila', value, time); }
+    fild(value: number = 100, time: number): void { this.messageDevice('fild', value, time); }
+    fils(value: number = 0.8, time: number): void { this.messageDevice('fils', value, time); }
+    filr(value: number = 1000, time: number): void { this.messageDevice('filr', value, time); }
+    filacurve(value: number, time: number): void { this.messageDevice('filacurve', value, time); }
+    fildcurve(value: number, time: number): void { this.messageDevice('fildcurve', value, time); }
+    filrcurve(value: number, time: number): void { this.messageDevice('filrcurve', value, time); }
+    res(value: number = 0, time: number): void { this.messageDevice('res', value, time); }
+    _res(value: number = 0, time: number): void { this.messageDevice('_res', value, time); }
+    cutoff(value: number = 20000, time: number): void { this.messageDevice('cutoff', value, time); }
+    _cutoff(value: number = 20000, time: number): void { this.messageDevice('_cutoff', value, time); }
+    detune(value: number = 0, time: number): void { this.messageDevice('detune', value, time); }
+    _detune(value: number = 0, time: number): void { this.messageDevice('_detune', value, time); }
 }
 
 export default BaseSynth;
