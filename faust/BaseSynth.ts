@@ -119,7 +119,6 @@ class BaseSynth extends FaustDevice {
             console.log('note on timer')
             this.node.keyOn(0, n, Math.round(amp * 127));
         });
-
         const releaseEv = this._schedule(releaseTime, () => {
             console.log('note off timer')
             this.node.keyOff(0, n, 0);
@@ -127,6 +126,7 @@ class BaseSynth extends FaustDevice {
             this._releaseEvents.delete(n);
         });
         this._releaseEvents.set(n, releaseEv);
+
     }
 
     release(n: number, time: number): void {
