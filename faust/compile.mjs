@@ -12,7 +12,7 @@
  *   npm run faust:compile -- --mono   -- compile all as monophonic
  */
 import faust2wasmFiles from '@grame/faustwasm/src/faust2wasmFiles.js';
-import { readdirSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { readdirSync, readFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -33,10 +33,14 @@ for (const file of files) {
     const inputFile = join(dspDir, file);
     const outputDir = join(wasmDir, name);
     if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
-    console.log(`\nCompiling ${name} (${poly ? 'polyphonic' : 'monophonic'})...`);
+    // A DSP file with '// @effect' on the first line is compiled as a mono effect
+    const firstLine = readFileSync(inputFile, 'utf8').split('\n')[0];
+    const isEffect = firstLine.includes('@effect');
+    const compilePoly = poly && !isEffect;
+    console.log(`\nCompiling ${name} (${compilePoly ? 'polyphonic' : 'monophonic'})...`);
     try {
-        const { dspMeta } = await faust2wasmFiles(inputFile, outputDir, [], poly);
-        writeIndexTs(outputDir, dspMeta, poly);
+        const { dspMeta } = await faust2wasmFiles(inputFile, outputDir, [], compilePoly);
+        writeIndexTs(outputDir, dspMeta, compilePoly);
         console.log(`✓ ${name} → wasm/${name}/`);
     } catch (e) {
         console.error(`✗ ${name}: ${e.message}`);

@@ -13,6 +13,7 @@ interface FaustMeta {
 
 class FaustDevice {
     defaults: Dictionary = {}
+    prefix: string = ''   // e.g. 'fdist'; bare prefix → 'mix', prefix+tag → tag
     input: Gain
     output: Gain
     node!: FaustPolyAudioWorkletNode
@@ -47,6 +48,20 @@ class FaustDevice {
         generator.voiceFactory = voiceFactory;
         generator.mixerModule = mixerModule;
 
+        // window.__faustRegistered persists across HMR (module re-evals reset the static
+        // gWorkletProcessors Map, but the AudioWorklet scope keeps processors registered).
+        // Adding the name synchronously before the first await also prevents a race when
+        // two instances of the same synth type are created concurrently.
+        const faustRegistered: Set<string> = ((window as any).__faustRegistered ??= new Set());
+        const processorName = `${meta.name}_poly`;
+        if (faustRegistered.has(processorName)) {
+            if (!FaustPolyDspGenerator.gWorkletProcessors.has(this.context))
+                FaustPolyDspGenerator.gWorkletProcessors.set(this.context, new Set());
+            FaustPolyDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
+        } else {
+            faustRegistered.add(processorName);
+        }
+
         const node = await generator.createNode(this.context, voices, meta.name);
         if (!node) throw new Error(`Failed to create Faust node for ${meta.name}`);
 
@@ -70,13 +85,30 @@ class FaustDevice {
 
         const generator = new FaustMonoDspGenerator();
         generator.factory = {
-            module: dspBuffer,
+            module: await WebAssembly.compile(dspBuffer),
             json: JSON.stringify(meta),
+            soundfiles: {},
+            cfactory: 0,
+            poly: false,
+            // @ts-ignore
+            code: '',
+            shaKey: ''
         };
+
+        const faustRegistered: Set<string> = ((window as any).__faustRegistered ??= new Set());
+        const processorName = meta.name;
+        if (faustRegistered.has(processorName)) {
+            if (!FaustMonoDspGenerator.gWorkletProcessors.has(this.context))
+                FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
+            FaustMonoDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
+        } else {
+            faustRegistered.add(processorName);
+        }
 
         const node = await generator.createNode(this.context, meta.name);
         if (!node) throw new Error(`Failed to create Faust mono node for ${meta.name}`);
 
+        // @ts-ignore
         this.node = node;
         this.params = this._buildParamList(meta);
 
@@ -127,7 +159,21 @@ class FaustDevice {
     }
 
     set(params: Dictionary, time: number) {
-        this.setParams(params, time)
+        if (!this.ready) return;
+        if (this.prefix) {
+            this._setPrefixed(params);
+        } else {
+            this.setParams(params, time);
+        }
+    }
+
+    private _setPrefixed(params: Dictionary) {
+        const { prefix } = this;
+        for (const [key, value] of Object.entries(params)) {
+            if (key !== prefix && !key.startsWith(prefix)) continue;
+            const tag = key.length === prefix.length ? 'mix' : key.slice(prefix.length);
+            if (this.paramPath(tag)) this.setParamValue(tag, value);
+        }
     }
 
     setParams(params: Dictionary, time: number) {
@@ -144,11 +190,22 @@ class FaustDevice {
         if (!this.ready) return;
         const { nudge } = params;
         const delay = Math.max(0, (time - this.context.currentTime) * 1000) + (nudge || 0);
-        const entries = Object.entries(params)
-            .filter(([k]) => k !== 'nudge')
-            .map(([key, value]): [string, number] =>
-                key === 'n' ? ['freq', 440 * Math.pow(2, (value - 69) / 12)] : [key, value]
-            );
+
+        let entries: [string, number][];
+        if (this.prefix) {
+            entries = Object.entries(params)
+                .filter(([k]) => k === this.prefix || k.startsWith(this.prefix))
+                .map(([key, value]): [string, number] => [
+                    key.length === this.prefix.length ? 'mix' : key.slice(this.prefix.length),
+                    value
+                ]);
+        } else {
+            entries = Object.entries(params)
+                .filter(([k]) => k !== 'nudge')
+                .map(([key, value]): [string, number] =>
+                    key === 'n' ? ['freq', 440 * Math.pow(2, (value - 69) / 12)] : [key, value]
+                );
+        }
 
         setTimeout(() => {
             this.setParamValue('lagtime', lag);
