@@ -26,6 +26,11 @@ modd    = hslider("modd", 100, 0, 5000, 1) * 0.001;
 mods    = hslider("mods", 1.0, 0, 1, 0.01);
 modr    = hslider("modr", 500, 0, 10000, 1) * 0.001;
 
+lpf     = varlag(hslider("lpf", 0, 0, 1, 0.001));
+hpf     = varlag(hslider("hpf", 0, 0, 1, 0.001));
+bpf     = varlag(hslider("bpf", 0, 0, 1, 0.001));
+res     = varlag(hslider("res", 0.01, 0, 1, 0.001));
+
 // --- Keyscaling (2^(-0.5) per octave above middle C) ---
 nL      = ba.hz2midikey(varlag(freq));
 ks      = (nL - 60.0) / 12.0;
@@ -43,7 +48,27 @@ modSig  = os.osc(freq * harm) * freq * modIdx * modEnv;
 car     = os.osc(freq + modSig);
 
 // --- Amplitude & pan ---
-angle   = varlag(pan) * ma.PI / 2.0;
+angle   = pan * ma.PI / 2.0;
 mono    = car * env * ampL * 0.5;
+stereo  = mono * cos(angle), mono * sin(angle);
 
-process = mono * cos(angle), mono * sin(angle);
+// --- Filters ---
+lpfFreq = max(20.0, min(19999.0, pow(20000.0, 1.0 - lpf) * pow(20.0, lpf)));
+hpfFreq = max(20.0, min(19999.0, pow(20.0,    1.0 - hpf) * pow(20000.0, hpf)));
+bpfFreq = max(20.0, min(19999.0, pow(20.0,    1.0 - bpf) * pow(20000.0, bpf)));
+safeRes = pow(40.0, res) * 0.5;  // 0→0.5, 1→20
+
+lpfSVF(x) = fi.svf.lp(lpfFreq, safeRes, x);
+hpfSVF(x) = fi.svf.hp(hpfFreq, safeRes, x);
+bpfSVF(x) = fi.svf.bp(bpfFreq, safeRes, x);
+
+withLPF(l, r) = select2(lpf > 0, l, lpfSVF(l)),
+                select2(lpf > 0, r, lpfSVF(r));
+
+withHPF(l, r) = select2(hpf > 0, l, hpfSVF(l)),
+                select2(hpf > 0, r, hpfSVF(r));
+
+withBPF(l, r) = select2(bpf > 0, l, bpfSVF(l)),
+                select2(bpf > 0, r, bpfSVF(r));
+
+process = stereo : withLPF : withHPF : withBPF;

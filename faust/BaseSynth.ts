@@ -13,7 +13,7 @@ class BaseSynth extends FaustDevice {
         dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1, hold: 0,
         a: 10, d: 100, s: 0.8, r: 500,
         moda: 10, modd: 100, mods: 0.8, modr: 500,
-        res: 0.01, cutoff: 20000, detune: 0,
+        res: 0.01, lpf: 0, hpf: 0, bpf: 0,
     }
 
     constructor() {

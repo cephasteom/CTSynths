@@ -10,7 +10,9 @@
         "/usr/share/faust/maths.lib",
         "/usr/share/faust/platform.lib",
         "/usr/share/faust/basics.lib",
-        "/usr/share/faust/envelopes.lib"
+        "/usr/share/faust/envelopes.lib",
+        "/usr/share/faust/filters.lib",
+        "/usr/share/faust/routes.lib"
     ],
     "include_pathnames": [
         "/faust/user/inc0",
@@ -19,8 +21,8 @@
         "/usr/share/faust",
         "."
     ],
-    "size": 262324,
-    "code": "eHPo",
+    "size": 262464,
+    "code": "KH4lAVQ8Hw==",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -55,6 +57,24 @@
             "filename": "fm"
         },
         {
+            "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/name": "Faust Filters Library"
+        },
+        {
+            "filters.lib/svf:author": "Oleg Nesterov"
+        },
+        {
+            "filters.lib/svf:copyright": "Copyright (C) 2020 Oleg Nesterov <oleg@redhat.com>"
+        },
+        {
+            "filters.lib/svf:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/version": "1.7.1"
+        },
+        {
             "maths.lib/author": "GRAME"
         },
         {
@@ -85,6 +105,12 @@
             "platform.lib/version": "1.3.0"
         },
         {
+            "routes.lib/name": "Faust Signal Routing Library"
+        },
+        {
+            "routes.lib/version": "1.2.0"
+        },
+        {
             "signals.lib/name": "Faust Signal Routing Library"
         },
         {
@@ -99,10 +125,10 @@
                 {
                     "type": "hslider",
                     "label": "a",
-                    "varname": "fHslider9",
+                    "varname": "fHslider12",
                     "shortname": "a",
                     "address": "/fm/a",
-                    "index": 262272,
+                    "index": 262308,
                     "init": 10,
                     "min": 0,
                     "max": 5000,
@@ -110,11 +136,23 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "bpf",
+                    "varname": "fHslider0",
+                    "shortname": "bpf",
+                    "address": "/fm/bpf",
+                    "index": 262144,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
                     "label": "d",
-                    "varname": "fHslider11",
+                    "varname": "fHslider14",
                     "shortname": "d",
                     "address": "/fm/d",
-                    "index": 262280,
+                    "index": 262316,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -123,10 +161,10 @@
                 {
                     "type": "hslider",
                     "label": "freq",
-                    "varname": "fHslider1",
+                    "varname": "fHslider5",
                     "shortname": "freq",
                     "address": "/fm/freq",
-                    "index": 262148,
+                    "index": 262220,
                     "init": 440,
                     "min": 20,
                     "max": 20000,
@@ -135,10 +173,10 @@
                 {
                     "type": "hslider",
                     "label": "gain",
-                    "varname": "fHslider0",
+                    "varname": "fHslider4",
                     "shortname": "gain",
                     "address": "/fm/gain",
-                    "index": 262144,
+                    "index": 262216,
                     "init": 1,
                     "min": 0,
                     "max": 1,
@@ -150,15 +188,15 @@
                     "varname": "fButton0",
                     "shortname": "gate",
                     "address": "/fm/gate",
-                    "index": 262152
+                    "index": 262148
                 },
                 {
                     "type": "hslider",
                     "label": "harm",
-                    "varname": "fHslider4",
+                    "varname": "fHslider7",
                     "shortname": "harm",
                     "address": "/fm/harm",
-                    "index": 262212,
+                    "index": 262248,
                     "init": 2,
                     "min": 0.1,
                     "max": 16,
@@ -166,11 +204,23 @@
                 },
                 {
                     "type": "hslider",
-                    "label": "lagtime",
+                    "label": "hpf",
                     "varname": "fHslider2",
+                    "shortname": "hpf",
+                    "address": "/fm/hpf",
+                    "index": 262192,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "lagtime",
+                    "varname": "fHslider1",
                     "shortname": "lagtime",
                     "address": "/fm/lagtime",
-                    "index": 262184,
+                    "index": 262180,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -178,11 +228,23 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "lpf",
+                    "varname": "fHslider3",
+                    "shortname": "lpf",
+                    "address": "/fm/lpf",
+                    "index": 262204,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
                     "label": "moda",
-                    "varname": "fHslider5",
+                    "varname": "fHslider8",
                     "shortname": "moda",
                     "address": "/fm/moda",
-                    "index": 262232,
+                    "index": 262268,
                     "init": 0,
                     "min": 0,
                     "max": 5000,
@@ -191,10 +253,10 @@
                 {
                     "type": "hslider",
                     "label": "modd",
-                    "varname": "fHslider7",
+                    "varname": "fHslider10",
                     "shortname": "modd",
                     "address": "/fm/modd",
-                    "index": 262248,
+                    "index": 262284,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -203,10 +265,10 @@
                 {
                     "type": "hslider",
                     "label": "modi",
-                    "varname": "fHslider3",
+                    "varname": "fHslider6",
                     "shortname": "modi",
                     "address": "/fm/modi",
-                    "index": 262200,
+                    "index": 262236,
                     "init": 3,
                     "min": 0,
                     "max": 20,
@@ -215,10 +277,10 @@
                 {
                     "type": "hslider",
                     "label": "modr",
-                    "varname": "fHslider8",
+                    "varname": "fHslider11",
                     "shortname": "modr",
                     "address": "/fm/modr",
-                    "index": 262252,
+                    "index": 262288,
                     "init": 500,
                     "min": 0,
                     "max": 10000,
@@ -227,10 +289,10 @@
                 {
                     "type": "hslider",
                     "label": "mods",
-                    "varname": "fHslider6",
+                    "varname": "fHslider9",
                     "shortname": "mods",
                     "address": "/fm/mods",
-                    "index": 262244,
+                    "index": 262280,
                     "init": 1,
                     "min": 0,
                     "max": 1,
@@ -239,10 +301,10 @@
                 {
                     "type": "hslider",
                     "label": "pan",
-                    "varname": "fHslider13",
+                    "varname": "fHslider16",
                     "shortname": "pan",
                     "address": "/fm/pan",
-                    "index": 262288,
+                    "index": 262324,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -251,10 +313,10 @@
                 {
                     "type": "hslider",
                     "label": "r",
-                    "varname": "fHslider12",
+                    "varname": "fHslider15",
                     "shortname": "r",
                     "address": "/fm/r",
-                    "index": 262284,
+                    "index": 262320,
                     "init": 300,
                     "min": 0,
                     "max": 10000,
@@ -262,11 +324,23 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "res",
+                    "varname": "fHslider17",
+                    "shortname": "res",
+                    "address": "/fm/res",
+                    "index": 262340,
+                    "init": 0.01,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
                     "label": "s",
-                    "varname": "fHslider10",
+                    "varname": "fHslider13",
                     "shortname": "s",
                     "address": "/fm/s",
-                    "index": 262276,
+                    "index": 262312,
                     "init": 0.7,
                     "min": 0,
                     "max": 1,
