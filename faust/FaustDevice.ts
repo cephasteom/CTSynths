@@ -48,21 +48,15 @@ class FaustDevice {
         generator.voiceFactory = voiceFactory;
         generator.mixerModule = mixerModule;
 
-        // window.__faustRegistered persists across HMR (module re-evals reset the static
-        // gWorkletProcessors Map, but the AudioWorklet scope keeps processors registered).
-        // Adding the name synchronously before the first await also prevents a race when
-        // two instances of the same synth type are created concurrently.
-        const faustRegistered: Set<string> = ((window as any).__faustRegistered ??= new Set());
         const processorName = `${meta.name}_poly`;
-        if (faustRegistered.has(processorName)) {
-            if (!FaustPolyDspGenerator.gWorkletProcessors.has(this.context))
-                FaustPolyDspGenerator.gWorkletProcessors.set(this.context, new Set());
-            FaustPolyDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
-        } else {
-            faustRegistered.add(processorName);
-        }
-
-        const node = await generator.createNode(this.context, voices, meta.name);
+        const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
+            if (alreadyRegistered) {
+                if (!FaustPolyDspGenerator.gWorkletProcessors.has(this.context))
+                    FaustPolyDspGenerator.gWorkletProcessors.set(this.context, new Set());
+                FaustPolyDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
+            }
+            return generator.createNode(this.context, voices, meta.name);
+        });
         if (!node) throw new Error(`Failed to create Faust node for ${meta.name}`);
 
         this.node = node;
@@ -95,17 +89,15 @@ class FaustDevice {
             shaKey: ''
         };
 
-        const faustRegistered: Set<string> = ((window as any).__faustRegistered ??= new Set());
         const processorName = meta.name;
-        if (faustRegistered.has(processorName)) {
-            if (!FaustMonoDspGenerator.gWorkletProcessors.has(this.context))
-                FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
-            FaustMonoDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
-        } else {
-            faustRegistered.add(processorName);
-        }
-
-        const node = await generator.createNode(this.context, meta.name);
+        const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
+            if (alreadyRegistered) {
+                if (!FaustMonoDspGenerator.gWorkletProcessors.has(this.context))
+                    FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
+                FaustMonoDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
+            }
+            return generator.createNode(this.context, meta.name);
+        });
         if (!node) throw new Error(`Failed to create Faust mono node for ${meta.name}`);
 
         // @ts-ignore
@@ -118,6 +110,32 @@ class FaustDevice {
         if (node.numberOfInputs > 0) this.input._gainNode._nativeAudioNode.connect(node);
 
         this.ready = true;
+    }
+
+    // Serialises AudioWorklet processor registration per processorName.
+    // Concurrent calls for the same name are queued; each waits for the previous to
+    // finish so that gWorkletProcessors is populated before the next createNode runs.
+    // Both maps live on window to survive Vite HMR module re-evaluation.
+    private static _serialiseInit<T>(
+        processorName: string,
+        work: (alreadyRegistered: boolean) => Promise<T>
+    ): Promise<T> {
+        const gates: Map<string, Promise<unknown>> = ((window as any).__faustGates ??= new Map());
+        const registered: Set<string> = ((window as any).__faustRegistered ??= new Set());
+
+        const result = (gates.get(processorName) ?? Promise.resolve()).then(() => {
+            const alreadyRegistered = registered.has(processorName);
+            return work(alreadyRegistered).then(node => {
+                registered.add(processorName);
+                return node;
+            });
+        });
+
+        // Store the tail of the chain so the next caller queues behind this one.
+        // Suppress errors on the gate so a failed init doesn't permanently block the queue.
+        gates.set(processorName, result.catch(() => {}));
+
+        return result;
     }
 
     private _buildParamList(meta: FaustMeta): string[] {
