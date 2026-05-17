@@ -1,16 +1,20 @@
 import("stdfaust.lib");
 
+// --- VarLag (snap on gate rising edge) ---
+lagtime = hslider("lagtime", 0, 0, 10000, 1) * 0.001;
+gate_trigger = gate > gate';
+lagpole      = select2(gate_trigger, exp(-1.0 / max(lagtime * ma.SR, 1.0)), 0.0);
+varlag(x)    = x : si.smooth(lagpole);
+
 // --- Polyphony controls (Faust poly naming convention) ---
-freq    = hslider("freq", 440, 20, 20000, 1);
+freq    = varlag(hslider("freq", 440, 20, 20000, 1));
 gain    = hslider("gain", 1, 0, 1, 0.01);
 gate    = button("gate");
 
 // --- Per-voice controls ---
-harm    = hslider("harm", 2.0, 0.1, 16.0, 0.01);
-modi    = hslider("modi", 3.0, 0, 20.0, 0.01);
-pan     = hslider("pan", 0.5, 0, 1, 0.01);
-
-lagtime = hslider("lagtime", 0, 0, 10000, 1) * 0.001;
+harm    = varlag(hslider("harm", 2.0, 0.1, 16.0, 0.01));
+modi    = varlag(hslider("modi", 3.0, 0, 20.0, 0.01));
+pan     = varlag(hslider("pan", 0.5, 0, 1, 0.01));
 
 a       = hslider("a", 10, 0, 5000, 1) * 0.001;
 d       = hslider("d", 100, 0, 5000, 1) * 0.001;
@@ -22,15 +26,11 @@ modd    = hslider("modd", 100, 0, 5000, 1) * 0.001;
 mods    = hslider("mods", 1.0, 0, 1, 0.01);
 modr    = hslider("modr", 500, 0, 10000, 1) * 0.001;
 
-lpf     = hslider("lpf", 0, 0, 1, 0.001);
-hpf     = hslider("hpf", 0, 0, 1, 0.001);
-bpf     = hslider("bpf", 0, 0, 1, 0.001);
-res     = hslider("res", 1.0, 0.01, 100.0, 0.01);
+lpf     = varlag(hslider("lpf", 0, 0, 1, 0.001));
+hpf     = varlag(hslider("hpf", 0, 0, 1, 0.001));
+bpf     = varlag(hslider("bpf", 0, 0, 1, 0.001));
+res     = varlag(hslider("res", 1.0, 0.01, 100.0, 0.01));
 
-// --- VarLag (snap on gate rising edge) ---
-gate_trigger = gate > gate';
-lagpole      = select2(gate_trigger, exp(-1.0 / max(lagtime * ma.SR, 1.0)), 0.0);
-varlag(x)    = x : si.smooth(lagpole);
 
 // --- Keyscaling (2^(-0.5) per octave above middle C) ---
 nL      = ba.hz2midikey(varlag(freq));
@@ -38,9 +38,9 @@ ks      = (nL - 60.0) / 12.0;
 ksScale = pow(2.0, ks * -0.5);
 
 ampL    = gain * ksScale;
-modIdx  = varlag(modi) * ksScale * ampL;
-panL    = varlag(pan);
-freqL   = varlag(freq);
+modIdx  = modi * ksScale * ampL;
+panL    = pan;
+freqL   = freq;
 
 // --- Envelopes ---
 modEnv  = en.adsr(moda, modd, mods, modr, gate);
