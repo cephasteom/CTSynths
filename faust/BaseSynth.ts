@@ -6,7 +6,7 @@ import type { Dictionary } from '../types';
  * Do not instantiate directly.
  */
 class BaseSynth extends FaustDevice {
-    private _releaseTimers = new Map<number, ReturnType<typeof setTimeout>>()
+    private _releaseTimers = new Map<Symbol, ReturnType<typeof setTimeout>>()
     private _activeNotes = new Set<number>()
 
     defaults: Dictionary = {
@@ -59,29 +59,21 @@ class BaseSynth extends FaustDevice {
 
     play(params: Dictionary = {}, time: number): void {
         if (!this.ready) return;
-        console.log(params)
 
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur } = ps;
 
-        const existing = this._releaseTimers.get(n);
-        if (existing !== undefined) {
-            clearTimeout(existing);
-            this._releaseTimers.delete(n);
-        }
+        const eventId = Symbol();  // unique per note event
 
         const paramDelay = Math.max(0, (time - this.context.currentTime) * 1000);
         const noteDelay = paramDelay + (nudge || 0) + 10;
 
         setTimeout(() => {
             this.setParamValue('lagtime', 0);
-
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key) && !['lag'].includes(key))
-                .forEach(([key, value]) => {
-                    this.setParamValue(key, value)
-                });
+                .forEach(([key, value]) => this.setParamValue(key, value));
         }, paramDelay);
 
         setTimeout(() => {
@@ -90,24 +82,16 @@ class BaseSynth extends FaustDevice {
             const id = setTimeout(() => {
                 this.node.keyOff(0, n, 0);
                 this._activeNotes.delete(n);
-                this._releaseTimers.delete(n);
+                this._releaseTimers.delete(eventId);
             }, dur);
-            this._releaseTimers.set(n, id);
+            this._releaseTimers.set(eventId, id);
         }, noteDelay);
-
-    }
-
-    release(n: number, time: number): void {
-        if (!this.ready) return;
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 10;
-        setTimeout(() => this.node.keyOff(0, n, 0), delay);
     }
 
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
-        // delay cut timer by 1 ms so that it happens after the param timer
         const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
-        
+
         const notes = [...this._activeNotes];
         this._activeNotes.clear();
         this._releaseTimers.forEach(id => clearTimeout(id));
@@ -116,6 +100,12 @@ class BaseSynth extends FaustDevice {
             this.setParamValue('r', ms);
             notes.forEach(n => this.node.keyOff(0, n, 0));
         }, delay);
+    }
+
+    release(n: number, time: number): void {
+        if (!this.ready) return;
+        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 10;
+        setTimeout(() => this.node.keyOff(0, n, 0), delay);
     }
 
     dur(value: number = 1000, time: number): void { this.messageDevice('dur', value, time); }
