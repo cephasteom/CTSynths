@@ -1,13 +1,23 @@
 import FaustDevice from './FaustDevice';
 import type { Dictionary } from '../types';
 
+interface ScheduledEvent {
+    time: number;
+    fn: () => void;
+}
+
 /**
  * Base class for all Faust polyphonic synths. Mirrors the rnbo/BaseSynth API.
  * Do not instantiate directly.
  */
 class BaseSynth extends FaustDevice {
-    private _releaseTimers = new Map<number, ReturnType<typeof setTimeout>>()
-    private _activeNotes = new Set<number>()
+    private _scheduledEvents: ScheduledEvent[] = [];
+    private _schedulerHandle: number | null = null;
+    private _releaseEvents = new Map<number, ScheduledEvent>();
+    private _activeNotes = new Map<number, number>(); // note → scheduled keyOn time
+
+    private readonly LOOKAHEAD = 0.05;  // 50ms lookahead window
+    private readonly IMMEDIATE = 0.005; // fire immediately if within 5ms
 
     defaults: Dictionary = {
         dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1,
@@ -31,61 +41,118 @@ class BaseSynth extends FaustDevice {
         this.r = this.r.bind(this);
     }
 
+    // -------------------------------------------------------------------------
+    // Scheduler
+    // -------------------------------------------------------------------------
+
+    private _startScheduler(): void {
+        if (this._schedulerHandle !== null) return;
+        const tick = () => {
+            const now = this.context.currentTime;
+            this._scheduledEvents = this._scheduledEvents.filter(ev => {
+                if (ev.time <= now + this.LOOKAHEAD) {
+                    ev.fn();
+                    return false;
+                }
+                return true;
+            });
+            if (this._scheduledEvents.length > 0) {
+                this._schedulerHandle = requestAnimationFrame(tick);
+            } else {
+                this._schedulerHandle = null;
+            }
+        };
+        this._schedulerHandle = requestAnimationFrame(tick);
+    }
+
+    private _schedule(time: number, fn: () => void): ScheduledEvent {
+        if (time <= this.context.currentTime + this.IMMEDIATE) {
+            fn();
+            return { time, fn };
+        }
+        const ev: ScheduledEvent = { time, fn };
+        this._scheduledEvents.push(ev);
+        this._scheduledEvents.sort((a, b) => a.time - b.time);
+        this._startScheduler();
+        return ev;
+    }
+
+    private _cancel(ev: ScheduledEvent): void {
+        const idx = this._scheduledEvents.indexOf(ev);
+        if (idx !== -1) this._scheduledEvents.splice(idx, 1);
+    }
+
+    // -------------------------------------------------------------------------
+    // Playback
+    // -------------------------------------------------------------------------
+
     play(params: Dictionary = {}, time: number): void {
         if (!this.ready) return;
 
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur } = ps;
 
-        const existing = this._releaseTimers.get(n);
-        if (existing !== undefined) {
-            clearTimeout(existing);
-            this._releaseTimers.delete(n);
+        // Cancel any pending release for this note
+        const existingRelease = this._releaseEvents.get(n);
+        if (existingRelease !== undefined) {
+            this._cancel(existingRelease);
+            this._releaseEvents.delete(n);
         }
 
-        const paramDelay = Math.max(0, (time - this.context.currentTime) * 1000);
-        const noteDelay = paramDelay + (nudge || 0) + 10;
+        const paramTime = time;
+        const noteTime = time + ((nudge || 0) + 10) / 1000;
+        const releaseTime = noteTime + dur / 1000;
 
-        setTimeout(() => {
+        this._schedule(paramTime, () => {
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key))
                 .forEach(([key, value]) => this.setParamValue(key, value));
-        }, paramDelay);
+        });
 
-        setTimeout(() => {
-            this._activeNotes.add(n);
+        // Track at schedule time so cut() knows about pending notes
+        this._activeNotes.set(n, noteTime);
+
+        this._schedule(noteTime, () => {
             this.node.keyOn(0, n, Math.round(amp * 127));
-            const id = setTimeout(() => {
-                this.node.keyOff(0, n, 0);
-                this._activeNotes.delete(n);
-                this._releaseTimers.delete(n);
-            }, dur);
-            this._releaseTimers.set(n, id);
-        }, noteDelay);
+        });
 
+        const releaseEv = this._schedule(releaseTime, () => {
+            this.node.keyOff(0, n, 0);
+            this._activeNotes.delete(n);
+            this._releaseEvents.delete(n);
+        });
+        this._releaseEvents.set(n, releaseEv);
     }
 
     release(n: number, time: number): void {
         if (!this.ready) return;
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 10;
-        setTimeout(() => this.node.keyOff(0, n, 0), delay);
+        this._schedule(time + 0.01, () => this.node.keyOff(0, n, 0));
     }
 
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
-        // delay cut timer by 1 ms so that it happens after the param timer
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
-        
-        const notes = [...this._activeNotes];
+
+        // Cancel all pending releases
+        this._releaseEvents.forEach(ev => this._cancel(ev));
+        this._releaseEvents.clear();
+
+        const notes = [...this._activeNotes.entries()];
         this._activeNotes.clear();
-        this._releaseTimers.forEach(id => clearTimeout(id));
-        this._releaseTimers.clear();
-        setTimeout(() => {
-            this.setParamValue('r', ms);
-            notes.forEach(n => this.node.keyOff(0, n, 0));
-        }, delay);
+
+        // keyOff each note strictly after its keyOn has fired
+        notes.forEach(([n, keyOnTime]) => {
+            const cutTime = Math.max(time, keyOnTime) + 0.001;
+            this._schedule(cutTime, () => {
+                this.setParamValue('r', ms);
+                this.node.keyOff(0, n, 0);
+            });
+        });
     }
+
+    // -------------------------------------------------------------------------
+    // Parameter methods
+    // -------------------------------------------------------------------------
 
     dur(value: number = 1000, time: number): void { this.messageDevice('dur', value, time); }
     n(value: number = 60, time: number): void { this.messageDevice('n', value, time); }
