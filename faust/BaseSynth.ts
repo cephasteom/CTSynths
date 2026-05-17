@@ -88,6 +88,7 @@ class BaseSynth extends FaustDevice {
 
     play(params: Dictionary = {}, time: number): void {
         if (!this.ready) return;
+        console.log('play method')
 
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur } = ps;
@@ -104,6 +105,7 @@ class BaseSynth extends FaustDevice {
         const releaseTime = noteTime + dur / 1000;
 
         this._schedule(paramTime, () => {
+            console.log('param timer')
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key))
@@ -114,10 +116,12 @@ class BaseSynth extends FaustDevice {
         this._activeNotes.set(n, noteTime);
 
         this._schedule(noteTime, () => {
+            console.log('note on timer')
             this.node.keyOn(0, n, Math.round(amp * 127));
         });
 
         const releaseEv = this._schedule(releaseTime, () => {
+            console.log('note off timer')
             this.node.keyOff(0, n, 0);
             this._activeNotes.delete(n);
             this._releaseEvents.delete(n);
@@ -133,17 +137,22 @@ class BaseSynth extends FaustDevice {
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
 
+        console.log('cut method')
+
         // Cancel all pending releases
         this._releaseEvents.forEach(ev => this._cancel(ev));
         this._releaseEvents.clear();
 
-        const notes = [...this._activeNotes.entries()];
-        this._activeNotes.clear();
+        // get notes that have already been scheduled
+        const notes = [...this._activeNotes.entries()]
+            .filter(([_, noteTime]) => noteTime < time)
+        notes.forEach(([n]) => this._activeNotes.delete(n))
 
         // keyOff each note strictly after its keyOn has fired
         notes.forEach(([n, keyOnTime]) => {
             const cutTime = Math.max(time, keyOnTime) + 0.001;
             this._schedule(cutTime, () => {
+                console.log('cut timer')
                 this.setParamValue('r', ms);
                 this.node.keyOff(0, n, 0);
             });
