@@ -20,7 +20,7 @@ class BaseSynth extends FaustDevice {
     private readonly IMMEDIATE = 0.005; // fire immediately if within 5ms
 
     defaults: Dictionary = {
-        dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1,
+        dur: 1000, n: 60, pan: 0.5, vol: 1, amp: .75,
         a: 10, d: 100, s: 0.8, r: 500,
     }
 

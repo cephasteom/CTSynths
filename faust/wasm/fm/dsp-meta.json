@@ -5,12 +5,11 @@
     "compile_options": "-lang wasm-e -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
     "library_list": [
         "/usr/share/faust/stdfaust.lib",
+        "/usr/share/faust/oscillators.lib",
+        "/usr/share/faust/basics.lib",
         "/usr/share/faust/signals.lib",
         "/usr/share/faust/maths.lib",
         "/usr/share/faust/platform.lib",
-        "/usr/share/faust/oscillators.lib",
-        "/usr/share/faust/basics.lib",
-        "/usr/share/faust/noises.lib",
         "/usr/share/faust/envelopes.lib",
         "/usr/share/faust/filters.lib"
     ],
@@ -21,8 +20,8 @@
         "/usr/share/faust",
         "."
     ],
-    "size": 278848,
-    "code": "kCkDAlQ8Hw==",
+    "size": 262592,
+    "code": "oBQ5AVQ8Hw==",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -57,19 +56,100 @@
             "filename": "fm"
         },
         {
+            "filters.lib/bandpass0_bandstop1:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/bandpass0_bandstop1:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/bandpass0_bandstop1:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/bandpass:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/bandpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/bandpass:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/fir:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/fir:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/highpass:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/highpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/iir:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/iir:license": "MIT-style STK-4.3 license"
+        },
+        {
             "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/lowpass:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/lowpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/lowpass:license": "MIT-style STK-4.3 license"
         },
         {
             "filters.lib/name": "Faust Filters Library"
         },
         {
-            "filters.lib/pole:author": "Julius O. Smith III"
+            "filters.lib/nlf2:author": "Julius O. Smith III"
         },
         {
-            "filters.lib/pole:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+            "filters.lib/nlf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
         },
         {
-            "filters.lib/pole:license": "MIT-style STK-4.3 license"
+            "filters.lib/nlf2:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/tf2:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/tf2:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/tf2s:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/tf2s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/tf2s:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/tf2sb:author": "Julius O. Smith III"
+        },
+        {
+            "filters.lib/tf2sb:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
+        },
+        {
+            "filters.lib/tf2sb:license": "MIT-style STK-4.3 license"
         },
         {
             "filters.lib/version": "1.7.1"
@@ -93,31 +173,7 @@
             "name": "fm"
         },
         {
-            "noises.lib/name": "Faust Noise Generator Library"
-        },
-        {
-            "noises.lib/version": "1.5.0"
-        },
-        {
-            "oscillators.lib/lf_sawpos:author": "Bart Brouns, revised by Stéphane Letz"
-        },
-        {
-            "oscillators.lib/lf_sawpos:licence": "STK-4.3"
-        },
-        {
             "oscillators.lib/name": "Faust Oscillator Library"
-        },
-        {
-            "oscillators.lib/saw2ptr:author": "Julius O. Smith III"
-        },
-        {
-            "oscillators.lib/saw2ptr:license": "STK-4.3"
-        },
-        {
-            "oscillators.lib/sawN:author": "Julius O. Smith III"
-        },
-        {
-            "oscillators.lib/sawN:license": "STK-4.3"
         },
         {
             "oscillators.lib/version": "1.7.0"
@@ -143,10 +199,10 @@
                 {
                     "type": "hslider",
                     "label": "a",
-                    "varname": "fHslider14",
+                    "varname": "fHslider12",
                     "shortname": "a",
                     "address": "/fm/a",
-                    "index": 278796,
+                    "index": 262296,
                     "init": 10,
                     "min": 0,
                     "max": 5000,
@@ -154,51 +210,39 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "amp",
+                    "varname": "fHslider3",
+                    "shortname": "amp",
+                    "address": "/fm/amp",
+                    "index": 262156,
+                    "init": 0.5,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "bpf",
+                    "varname": "fHslider0",
+                    "shortname": "bpf",
+                    "address": "/fm/bpf",
+                    "index": 262144,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
                     "label": "d",
-                    "varname": "fHslider16",
+                    "varname": "fHslider14",
                     "shortname": "d",
                     "address": "/fm/d",
-                    "index": 278804,
+                    "index": 262304,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
                     "step": 1
-                },
-                {
-                    "type": "hslider",
-                    "label": "drift",
-                    "varname": "fHslider7",
-                    "shortname": "drift",
-                    "address": "/fm/drift",
-                    "index": 262264,
-                    "init": 0,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.01
-                },
-                {
-                    "type": "hslider",
-                    "label": "freq",
-                    "varname": "fHslider4",
-                    "shortname": "freq",
-                    "address": "/fm/freq",
-                    "index": 262204,
-                    "init": 440,
-                    "min": 20,
-                    "max": 20000,
-                    "step": 1
-                },
-                {
-                    "type": "hslider",
-                    "label": "gain",
-                    "varname": "fHslider0",
-                    "shortname": "gain",
-                    "address": "/fm/gain",
-                    "index": 262144,
-                    "init": 1,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.01
                 },
                 {
                     "type": "button",
@@ -206,27 +250,39 @@
                     "varname": "fButton0",
                     "shortname": "gate",
                     "address": "/fm/gate",
-                    "index": 262152
+                    "index": 262160
                 },
                 {
                     "type": "hslider",
                     "label": "harm",
-                    "varname": "fHslider8",
+                    "varname": "fHslider7",
                     "shortname": "harm",
                     "address": "/fm/harm",
-                    "index": 262276,
-                    "init": 1,
-                    "min": 0.01,
+                    "index": 262236,
+                    "init": 2,
+                    "min": 0.1,
                     "max": 16,
                     "step": 0.01
                 },
                 {
                     "type": "hslider",
-                    "label": "lagtime",
-                    "varname": "fHslider2",
-                    "shortname": "lagtime",
-                    "address": "/fm/lagtime",
-                    "index": 262184,
+                    "label": "hpf",
+                    "varname": "fHslider1",
+                    "shortname": "hpf",
+                    "address": "/fm/hpf",
+                    "index": 262148,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
+                    "label": "lag",
+                    "varname": "fHslider4",
+                    "shortname": "lag",
+                    "address": "/fm/lag",
+                    "index": 262192,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -234,36 +290,24 @@
                 },
                 {
                     "type": "hslider",
-                    "label": "lfodepth",
-                    "varname": "fHslider5",
-                    "shortname": "lfodepth",
-                    "address": "/fm/lfodepth",
-                    "index": 262216,
+                    "label": "lpf",
+                    "varname": "fHslider2",
+                    "shortname": "lpf",
+                    "address": "/fm/lpf",
+                    "index": 262152,
                     "init": 0,
                     "min": 0,
                     "max": 1,
-                    "step": 0.01
-                },
-                {
-                    "type": "hslider",
-                    "label": "lforate",
-                    "varname": "fHslider6",
-                    "shortname": "lforate",
-                    "address": "/fm/lforate",
-                    "index": 262228,
-                    "init": 1,
-                    "min": 0.01,
-                    "max": 20,
-                    "step": 0.01
+                    "step": 0.001
                 },
                 {
                     "type": "hslider",
                     "label": "moda",
-                    "varname": "fHslider10",
+                    "varname": "fHslider8",
                     "shortname": "moda",
                     "address": "/fm/moda",
-                    "index": 262308,
-                    "init": 10,
+                    "index": 262248,
+                    "init": 0,
                     "min": 0,
                     "max": 5000,
                     "step": 1
@@ -271,34 +315,10 @@
                 {
                     "type": "hslider",
                     "label": "modd",
-                    "varname": "fHslider11",
+                    "varname": "fHslider10",
                     "shortname": "modd",
                     "address": "/fm/modd",
-                    "index": 262320,
-                    "init": 500,
-                    "min": 0,
-                    "max": 5000,
-                    "step": 1
-                },
-                {
-                    "type": "hslider",
-                    "label": "modi",
-                    "varname": "fHslider9",
-                    "shortname": "modi",
-                    "address": "/fm/modi",
-                    "index": 262288,
-                    "init": 0,
-                    "min": 0,
-                    "max": 20,
-                    "step": 0.01
-                },
-                {
-                    "type": "hslider",
-                    "label": "modr",
-                    "varname": "fHslider13",
-                    "shortname": "modr",
-                    "address": "/fm/modr",
-                    "index": 262344,
+                    "index": 262264,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -306,35 +326,59 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "modi",
+                    "varname": "fHslider6",
+                    "shortname": "modi",
+                    "address": "/fm/modi",
+                    "index": 262220,
+                    "init": 3,
+                    "min": 0,
+                    "max": 20,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "modr",
+                    "varname": "fHslider11",
+                    "shortname": "modr",
+                    "address": "/fm/modr",
+                    "index": 262268,
+                    "init": 500,
+                    "min": 0,
+                    "max": 10000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
                     "label": "mods",
-                    "varname": "fHslider12",
+                    "varname": "fHslider9",
                     "shortname": "mods",
                     "address": "/fm/mods",
-                    "index": 262324,
-                    "init": 0,
+                    "index": 262260,
+                    "init": 1,
                     "min": 0,
                     "max": 1,
                     "step": 0.01
                 },
                 {
                     "type": "hslider",
-                    "label": "osc",
-                    "varname": "fHslider3",
-                    "shortname": "osc",
-                    "address": "/fm/osc",
-                    "index": 262196,
-                    "init": 0,
+                    "label": "n",
+                    "varname": "fHslider5",
+                    "shortname": "n",
+                    "address": "/fm/n",
+                    "index": 262208,
+                    "init": 60,
                     "min": 0,
-                    "max": 3,
+                    "max": 127,
                     "step": 1
                 },
                 {
                     "type": "hslider",
                     "label": "pan",
-                    "varname": "fHslider18",
+                    "varname": "fHslider16",
                     "shortname": "pan",
                     "address": "/fm/pan",
-                    "index": 278820,
+                    "index": 262312,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -343,35 +387,35 @@
                 {
                     "type": "hslider",
                     "label": "r",
-                    "varname": "fHslider17",
+                    "varname": "fHslider15",
                     "shortname": "r",
                     "address": "/fm/r",
-                    "index": 278808,
-                    "init": 500,
+                    "index": 262308,
+                    "init": 300,
                     "min": 0,
                     "max": 10000,
                     "step": 1
                 },
                 {
                     "type": "hslider",
-                    "label": "s",
-                    "varname": "fHslider15",
-                    "shortname": "s",
-                    "address": "/fm/s",
-                    "index": 278800,
-                    "init": 0.8,
-                    "min": 0,
-                    "max": 1,
+                    "label": "res",
+                    "varname": "fHslider17",
+                    "shortname": "res",
+                    "address": "/fm/res",
+                    "index": 262388,
+                    "init": 1,
+                    "min": 0.01,
+                    "max": 100,
                     "step": 0.01
                 },
                 {
                     "type": "hslider",
-                    "label": "vol",
-                    "varname": "fHslider1",
-                    "shortname": "vol",
-                    "address": "/fm/vol",
-                    "index": 262148,
-                    "init": 1,
+                    "label": "s",
+                    "varname": "fHslider13",
+                    "shortname": "s",
+                    "address": "/fm/s",
+                    "index": 262300,
+                    "init": 0.7,
                     "min": 0,
                     "max": 1,
                     "step": 0.01
