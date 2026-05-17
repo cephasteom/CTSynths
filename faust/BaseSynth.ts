@@ -39,7 +39,6 @@ class BaseSynth extends FaustDevice {
         }, paramDelay);
 
         setTimeout(() => {
-            this.node.keyOff(0, n, 0); // silence any that are already playing
             this.node.keyOn(0, n, Math.round(amp * 127));
             const id = setTimeout(() => {
                 this.node.keyOff(0, n, 0);

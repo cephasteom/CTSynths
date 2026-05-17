@@ -26,10 +26,10 @@ modd    = hslider("modd", 100, 0, 5000, 1) * 0.001;
 mods    = hslider("mods", 1.0, 0, 1, 0.01);
 modr    = hslider("modr", 500, 0, 10000, 1) * 0.001;
 
-lpf     = varlag(hslider("lpf", 0, 0, 1, 0.001));
-hpf     = varlag(hslider("hpf", 0, 0, 1, 0.001));
-bpf     = varlag(hslider("bpf", 0, 0, 1, 0.001));
-res     = varlag(hslider("res", 0.01, 0, 1, 0.001));
+lpf     = varlag(hslider("lpfv", 0, 0, 1, 0.001));
+hpf     = varlag(hslider("hpfv", 0, 0, 1, 0.001));
+bpf     = varlag(hslider("bpfv", 0, 0, 1, 0.001));
+res     = varlag(hslider("resv", 0.01, 0, 1, 0.001));
 
 // --- Keyscaling (2^(-0.5) per octave above middle C) ---
 nL      = ba.hz2midikey(varlag(freq));
