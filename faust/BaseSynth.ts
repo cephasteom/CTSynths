@@ -101,7 +101,8 @@ class BaseSynth extends FaustDevice {
 
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000);
+        // delay cut timer by 1 ms so that it happens after the param timer
+        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
         
         const notes = [...this._activeNotes];
         this._activeNotes.clear();
