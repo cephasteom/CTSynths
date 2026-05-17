@@ -1,14 +1,16 @@
 import("stdfaust.lib");
 
-// --- Controls ---
-n       = hslider("n", 60, 0, 127, 1);
-harm    = hslider("harm", 2.0, 0.1, 16.0, 0.01);
-modi    = hslider("modi", 3.0, 0, 20.0, 0.01);
-amp     = hslider("amp", 0.5, 0, 1, 0.01);
-pan     = hslider("pan", 0.5, 0, 1, 0.01);
+// --- Polyphony controls (Faust poly naming convention) ---
+freq    = hslider("freq", 440, 20, 20000, 1);
+gain    = hslider("gain", 1, 0, 1, 0.01);
 gate    = button("gate");
 
-lagtime = hslider("lag", 0, 0, 10000, 1) * 0.001;
+// --- Per-voice controls ---
+harm    = hslider("harm", 2.0, 0.1, 16.0, 0.01);
+modi    = hslider("modi", 3.0, 0, 20.0, 0.01);
+pan     = hslider("pan", 0.5, 0, 1, 0.01);
+
+lagtime = hslider("lagtime", 0, 0, 10000, 1) * 0.001;
 
 a       = hslider("a", 10, 0, 5000, 1) * 0.001;
 d       = hslider("d", 100, 0, 5000, 1) * 0.001;
@@ -30,30 +32,30 @@ gate_trigger = gate > gate';
 lagpole      = select2(gate_trigger, exp(-1.0 / max(lagtime * ma.SR, 1.0)), 0.0);
 varlag(x)    = x : si.smooth(lagpole);
 
-// --- Derived values ---
-nL      = varlag(n);
-freq    = ba.midikey2hz(nL);
-ks      = (nL - 60.0) / 12.0;          // octaves above/below middle C
-ksScale = pow(2.0, ks * -0.5);         // 2^(-0.5) per octave above C4
+// --- Keyscaling (2^(-0.5) per octave above middle C) ---
+nL      = ba.hz2midikey(varlag(freq));
+ks      = (nL - 60.0) / 12.0;
+ksScale = pow(2.0, ks * -0.5);
 
-ampL    = varlag(amp) * ksScale;
+ampL    = gain * ksScale;
 modIdx  = varlag(modi) * ksScale * ampL;
 panL    = varlag(pan);
+freqL   = varlag(freq);
 
 // --- Envelopes ---
 modEnv  = en.adsr(moda, modd, mods, modr, gate);
 env     = en.adsr(a, d, s, r, gate);
 
 // --- FM core ---
-modSig  = os.osc(freq * varlag(harm)) * freq * modIdx * modEnv;
-car     = os.oscrc(freq + modSig);     // os.oscrc resets phase on note-on
+modSig  = os.osc(freqL * harm) * freqL * modIdx * modEnv;
+car     = os.osc(freqL + modSig);
 
 // --- Amplitude & pan ---
 angle   = panL * ma.PI / 2.0;
 mono    = car * env * ampL * 0.5;
 stereo  = mono * cos(angle), mono * sin(angle);
 
-// --- Filters (bypass when param = 0) ---
+// --- Filters ---
 lpfFreq = pow(20000.0, 1.0 - lpf) * pow(20.0, lpf);
 hpfFreq = pow(20.0,    1.0 - hpf) * pow(20000.0, hpf);
 bpfFreq = pow(20.0,    1.0 - bpf) * pow(20000.0, bpf);

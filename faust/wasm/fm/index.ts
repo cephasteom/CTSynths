@@ -9,10 +9,10 @@ export const meta = {
     "library_list": [
         "/usr/share/faust/stdfaust.lib",
         "/usr/share/faust/oscillators.lib",
-        "/usr/share/faust/basics.lib",
         "/usr/share/faust/signals.lib",
         "/usr/share/faust/maths.lib",
         "/usr/share/faust/platform.lib",
+        "/usr/share/faust/basics.lib",
         "/usr/share/faust/envelopes.lib",
         "/usr/share/faust/filters.lib"
     ],
@@ -23,8 +23,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262600,
-    "code": "4Kc8AVQ8Hw==",
+    "size": 262568,
+    "code": "6Cw5AVQ8Hw==",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -119,15 +119,6 @@ export const meta = {
             "filters.lib/name": "Faust Filters Library"
         },
         {
-            "filters.lib/nlf2:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/nlf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/nlf2:license": "MIT-style STK-4.3 license"
-        },
-        {
             "filters.lib/tf2:author": "Julius O. Smith III"
         },
         {
@@ -205,23 +196,11 @@ export const meta = {
                     "varname": "fHslider12",
                     "shortname": "a",
                     "address": "/fm/a",
-                    "index": 262304,
+                    "index": 262276,
                     "init": 10,
                     "min": 0,
                     "max": 5000,
                     "step": 1
-                },
-                {
-                    "type": "hslider",
-                    "label": "amp",
-                    "varname": "fHslider3",
-                    "shortname": "amp",
-                    "address": "/fm/amp",
-                    "index": 262156,
-                    "init": 0.5,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.01
                 },
                 {
                     "type": "hslider",
@@ -241,11 +220,35 @@ export const meta = {
                     "varname": "fHslider14",
                     "shortname": "d",
                     "address": "/fm/d",
-                    "index": 262312,
+                    "index": 262284,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
                     "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "freq",
+                    "varname": "fHslider4",
+                    "shortname": "freq",
+                    "address": "/fm/freq",
+                    "index": 262160,
+                    "init": 440,
+                    "min": 20,
+                    "max": 20000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "gain",
+                    "varname": "fHslider3",
+                    "shortname": "gain",
+                    "address": "/fm/gain",
+                    "index": 262156,
+                    "init": 1,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
                 },
                 {
                     "type": "button",
@@ -253,7 +256,7 @@ export const meta = {
                     "varname": "fButton0",
                     "shortname": "gate",
                     "address": "/fm/gate",
-                    "index": 262160
+                    "index": 262164
                 },
                 {
                     "type": "hslider",
@@ -261,7 +264,7 @@ export const meta = {
                     "varname": "fHslider7",
                     "shortname": "harm",
                     "address": "/fm/harm",
-                    "index": 262236,
+                    "index": 262224,
                     "init": 2,
                     "min": 0.1,
                     "max": 16,
@@ -281,11 +284,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "lag",
-                    "varname": "fHslider4",
-                    "shortname": "lag",
-                    "address": "/fm/lag",
-                    "index": 262192,
+                    "label": "lagtime",
+                    "varname": "fHslider5",
+                    "shortname": "lagtime",
+                    "address": "/fm/lagtime",
+                    "index": 262196,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -309,7 +312,7 @@ export const meta = {
                     "varname": "fHslider8",
                     "shortname": "moda",
                     "address": "/fm/moda",
-                    "index": 262256,
+                    "index": 262236,
                     "init": 0,
                     "min": 0,
                     "max": 5000,
@@ -321,7 +324,7 @@ export const meta = {
                     "varname": "fHslider10",
                     "shortname": "modd",
                     "address": "/fm/modd",
-                    "index": 262272,
+                    "index": 262252,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -333,7 +336,7 @@ export const meta = {
                     "varname": "fHslider6",
                     "shortname": "modi",
                     "address": "/fm/modi",
-                    "index": 262220,
+                    "index": 262212,
                     "init": 3,
                     "min": 0,
                     "max": 20,
@@ -345,7 +348,7 @@ export const meta = {
                     "varname": "fHslider11",
                     "shortname": "modr",
                     "address": "/fm/modr",
-                    "index": 262276,
+                    "index": 262256,
                     "init": 500,
                     "min": 0,
                     "max": 10000,
@@ -357,7 +360,7 @@ export const meta = {
                     "varname": "fHslider9",
                     "shortname": "mods",
                     "address": "/fm/mods",
-                    "index": 262268,
+                    "index": 262248,
                     "init": 1,
                     "min": 0,
                     "max": 1,
@@ -365,23 +368,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "n",
-                    "varname": "fHslider5",
-                    "shortname": "n",
-                    "address": "/fm/n",
-                    "index": 262208,
-                    "init": 60,
-                    "min": 0,
-                    "max": 127,
-                    "step": 1
-                },
-                {
-                    "type": "hslider",
                     "label": "pan",
                     "varname": "fHslider16",
                     "shortname": "pan",
                     "address": "/fm/pan",
-                    "index": 262320,
+                    "index": 262292,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -393,7 +384,7 @@ export const meta = {
                     "varname": "fHslider15",
                     "shortname": "r",
                     "address": "/fm/r",
-                    "index": 262316,
+                    "index": 262288,
                     "init": 300,
                     "min": 0,
                     "max": 10000,
@@ -405,7 +396,7 @@ export const meta = {
                     "varname": "fHslider17",
                     "shortname": "res",
                     "address": "/fm/res",
-                    "index": 262396,
+                    "index": 262364,
                     "init": 1,
                     "min": 0.01,
                     "max": 100,
@@ -417,7 +408,7 @@ export const meta = {
                     "varname": "fHslider13",
                     "shortname": "s",
                     "address": "/fm/s",
-                    "index": 262308,
+                    "index": 262280,
                     "init": 0.7,
                     "min": 0,
                     "max": 1,

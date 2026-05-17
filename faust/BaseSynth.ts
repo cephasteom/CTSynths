@@ -13,8 +13,7 @@ class BaseSynth extends FaustDevice {
         dur: 1000, n: 60, pan: 0.5, vol: 1, amp: 1, hold: 0,
         a: 10, d: 100, s: 0.8, r: 500,
         moda: 10, modd: 100, mods: 0.8, modr: 500,
-        fila: 10, fild: 100, fils: 0.8, filr: 500,
-        res: 0, cutoff: 20000, detune: 0,
+        res: 0.01, cutoff: 20000, detune: 0,
     }
 
     constructor() {
@@ -60,6 +59,7 @@ class BaseSynth extends FaustDevice {
 
     play(params: Dictionary = {}, time: number): void {
         if (!this.ready) return;
+        console.log(params)
 
         const ps = { ...this.defaults, ...params };
         const { n, amp, nudge, dur } = ps;
@@ -74,10 +74,14 @@ class BaseSynth extends FaustDevice {
         const noteDelay = paramDelay + (nudge || 0) + 10;
 
         setTimeout(() => {
+            this.setParamValue('lagtime', 0);
+
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
-                .filter(([key]) => !!this.paramPath(key))
-                .forEach(([key, value]) => this.setParamValue(key, value));
+                .filter(([key]) => !!this.paramPath(key) && !['lag'].includes(key))
+                .forEach(([key, value]) => {
+                    this.setParamValue(key, value)
+                });
         }, paramDelay);
 
         setTimeout(() => {
