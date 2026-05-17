@@ -36,6 +36,8 @@ export const CtReverbGen = ReverbGen
 
 import SimpleSynth from "./faust/SimpleSynth";
 export const CtFaustSimpleSynth = SimpleSynth
+import FMSynth from "./faust/FMSynth";
+export const CtFaustFMSynth = FMSynth
 
 export const CtToneSynth = ToneSynth
 export const CtToneMonoSynth = MonoSynth
