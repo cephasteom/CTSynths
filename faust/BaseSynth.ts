@@ -137,27 +137,26 @@ class BaseSynth extends FaustDevice {
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
 
-        console.log('cut method')
+        // Split notes into ones to cut now vs ones scheduled in the future
+        const notesToCut = [...this._activeNotes.entries()]
+            .filter(([_, keyOnTime]) => keyOnTime <= time);
 
-        // Cancel all pending releases
-        this._releaseEvents.forEach(ev => this._cancel(ev));
-        this._releaseEvents.clear();
-
-        // get notes that have already been scheduled
-        const notes = [...this._activeNotes.entries()]
-            .filter(([_, noteTime]) => noteTime < time)
-        notes.forEach(([n]) => this._activeNotes.delete(n))
-
-        // keyOff each note strictly after its keyOn has fired
-        notes.forEach(([n, keyOnTime]) => {
+        notesToCut.forEach(([n, keyOnTime]) => {
+            // Only cancel releases for notes we're actually cutting
+            const releaseEv = this._releaseEvents.get(n);
+            if (releaseEv) {
+                this._cancel(releaseEv);
+                this._releaseEvents.delete(n);
+            }
+            this._activeNotes.delete(n);
+            
             const cutTime = Math.max(time, keyOnTime) + 0.001;
             this._schedule(cutTime, () => {
-                console.log('cut timer')
                 this.setParamValue('r', ms);
                 this.node.keyOff(0, n, 0);
             });
         });
-    }
+    }   
 
     // -------------------------------------------------------------------------
     // Parameter methods
