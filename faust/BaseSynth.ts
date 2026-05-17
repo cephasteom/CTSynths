@@ -62,7 +62,7 @@ class BaseSynth extends FaustDevice {
         if (!this.ready) return;
 
         const ps = { ...this.defaults, ...params };
-        const { n, amp, nudge, dur, hold } = ps;
+        const { n, amp, nudge, dur } = ps;
 
         const existing = this._releaseTimers.get(n);
         if (existing !== undefined) {
@@ -108,7 +108,6 @@ class BaseSynth extends FaustDevice {
         this._releaseTimers.forEach(id => clearTimeout(id));
         this._releaseTimers.clear();
         setTimeout(() => {
-            console.log('cut', notes)
             this.setParamValue('r', ms);
             notes.forEach(n => this.node.keyOff(0, n, 0));
         }, delay);

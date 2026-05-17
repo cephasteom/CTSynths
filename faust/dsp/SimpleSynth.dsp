@@ -15,7 +15,7 @@ varlag(x) = x : si.smooth(lagpole);
 a = hslider("a", 10, 0, 5000, 1) * 0.001;
 d = hslider("d", 100, 0, 5000, 1) * 0.001;
 s = hslider("s", 0.8, 0, 1, 0.01);
-r = hslider("r", 500, 0, 10000, 1) * 0.001;
+r = varlag(hslider("r", 500, 0, 10000, 1)) * 0.001;
 
 vol = varlag(hslider("vol", 1, 0, 1, 0.01));
 

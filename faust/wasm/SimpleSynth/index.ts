@@ -22,8 +22,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262280,
-    "code": "UC7U",
+    "size": 262288,
+    "code": "wI/V",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -173,7 +173,7 @@ export const meta = {
                     "varname": "fHslider8",
                     "shortname": "pan",
                     "address": "/SimpleSynth/pan",
-                    "index": 262252,
+                    "index": 262260,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -185,7 +185,7 @@ export const meta = {
                     "varname": "fHslider7",
                     "shortname": "r",
                     "address": "/SimpleSynth/r",
-                    "index": 262240,
+                    "index": 262248,
                     "init": 500,
                     "min": 0,
                     "max": 10000,
