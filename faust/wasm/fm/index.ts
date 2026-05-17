@@ -13,8 +13,7 @@ export const meta = {
         "/usr/share/faust/maths.lib",
         "/usr/share/faust/platform.lib",
         "/usr/share/faust/basics.lib",
-        "/usr/share/faust/envelopes.lib",
-        "/usr/share/faust/filters.lib"
+        "/usr/share/faust/envelopes.lib"
     ],
     "include_pathnames": [
         "/faust/user/inc0",
@@ -23,8 +22,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262616,
-    "code": "gIRuAVQ8Hw==",
+    "size": 262324,
+    "code": "eHPo",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -57,96 +56,6 @@ export const meta = {
         },
         {
             "filename": "fm"
-        },
-        {
-            "filters.lib/bandpass0_bandstop1:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/bandpass0_bandstop1:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/bandpass0_bandstop1:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/bandpass:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/bandpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/bandpass:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/fir:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/fir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/fir:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/highpass:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/highpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/iir:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/iir:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/iir:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/lowpass0_highpass1:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/lowpass:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/lowpass:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/lowpass:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/name": "Faust Filters Library"
-        },
-        {
-            "filters.lib/tf2:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/tf2:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/tf2:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/tf2s:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/tf2s:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/tf2s:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/tf2sb:author": "Julius O. Smith III"
-        },
-        {
-            "filters.lib/tf2sb:copyright": "Copyright (C) 2003-2019 by Julius O. Smith III <jos@ccrma.stanford.edu>"
-        },
-        {
-            "filters.lib/tf2sb:license": "MIT-style STK-4.3 license"
-        },
-        {
-            "filters.lib/version": "1.7.1"
         },
         {
             "maths.lib/author": "GRAME"
@@ -193,10 +102,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "a",
-                    "varname": "fHslider12",
+                    "varname": "fHslider9",
                     "shortname": "a",
                     "address": "/fm/a",
-                    "index": 262316,
+                    "index": 262272,
                     "init": 10,
                     "min": 0,
                     "max": 5000,
@@ -204,23 +113,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "bpf",
-                    "varname": "fHslider0",
-                    "shortname": "bpf",
-                    "address": "/fm/bpf",
-                    "index": 262144,
-                    "init": 0,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.001
-                },
-                {
-                    "type": "hslider",
                     "label": "d",
-                    "varname": "fHslider14",
+                    "varname": "fHslider11",
                     "shortname": "d",
                     "address": "/fm/d",
-                    "index": 262324,
+                    "index": 262280,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -229,10 +126,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "freq",
-                    "varname": "fHslider5",
+                    "varname": "fHslider1",
                     "shortname": "freq",
                     "address": "/fm/freq",
-                    "index": 262220,
+                    "index": 262148,
                     "init": 440,
                     "min": 20,
                     "max": 20000,
@@ -241,10 +138,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "gain",
-                    "varname": "fHslider4",
+                    "varname": "fHslider0",
                     "shortname": "gain",
                     "address": "/fm/gain",
-                    "index": 262216,
+                    "index": 262144,
                     "init": 1,
                     "min": 0,
                     "max": 1,
@@ -256,15 +153,15 @@ export const meta = {
                     "varname": "fButton0",
                     "shortname": "gate",
                     "address": "/fm/gate",
-                    "index": 262148
+                    "index": 262152
                 },
                 {
                     "type": "hslider",
                     "label": "harm",
-                    "varname": "fHslider7",
+                    "varname": "fHslider4",
                     "shortname": "harm",
                     "address": "/fm/harm",
-                    "index": 262256,
+                    "index": 262212,
                     "init": 2,
                     "min": 0.1,
                     "max": 16,
@@ -272,23 +169,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "hpf",
-                    "varname": "fHslider2",
-                    "shortname": "hpf",
-                    "address": "/fm/hpf",
-                    "index": 262192,
-                    "init": 0,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.001
-                },
-                {
-                    "type": "hslider",
                     "label": "lagtime",
-                    "varname": "fHslider1",
+                    "varname": "fHslider2",
                     "shortname": "lagtime",
                     "address": "/fm/lagtime",
-                    "index": 262180,
+                    "index": 262184,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -296,23 +181,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "lpf",
-                    "varname": "fHslider3",
-                    "shortname": "lpf",
-                    "address": "/fm/lpf",
-                    "index": 262204,
-                    "init": 0,
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.001
-                },
-                {
-                    "type": "hslider",
                     "label": "moda",
-                    "varname": "fHslider8",
+                    "varname": "fHslider5",
                     "shortname": "moda",
                     "address": "/fm/moda",
-                    "index": 262276,
+                    "index": 262232,
                     "init": 0,
                     "min": 0,
                     "max": 5000,
@@ -321,10 +194,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "modd",
-                    "varname": "fHslider10",
+                    "varname": "fHslider7",
                     "shortname": "modd",
                     "address": "/fm/modd",
-                    "index": 262292,
+                    "index": 262248,
                     "init": 100,
                     "min": 0,
                     "max": 5000,
@@ -333,10 +206,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "modi",
-                    "varname": "fHslider6",
+                    "varname": "fHslider3",
                     "shortname": "modi",
                     "address": "/fm/modi",
-                    "index": 262244,
+                    "index": 262200,
                     "init": 3,
                     "min": 0,
                     "max": 20,
@@ -345,10 +218,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "modr",
-                    "varname": "fHslider11",
+                    "varname": "fHslider8",
                     "shortname": "modr",
                     "address": "/fm/modr",
-                    "index": 262296,
+                    "index": 262252,
                     "init": 500,
                     "min": 0,
                     "max": 10000,
@@ -357,10 +230,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "mods",
-                    "varname": "fHslider9",
+                    "varname": "fHslider6",
                     "shortname": "mods",
                     "address": "/fm/mods",
-                    "index": 262288,
+                    "index": 262244,
                     "init": 1,
                     "min": 0,
                     "max": 1,
@@ -369,10 +242,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "pan",
-                    "varname": "fHslider16",
+                    "varname": "fHslider13",
                     "shortname": "pan",
                     "address": "/fm/pan",
-                    "index": 262332,
+                    "index": 262288,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -381,10 +254,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "r",
-                    "varname": "fHslider15",
+                    "varname": "fHslider12",
                     "shortname": "r",
                     "address": "/fm/r",
-                    "index": 262328,
+                    "index": 262284,
                     "init": 300,
                     "min": 0,
                     "max": 10000,
@@ -392,23 +265,11 @@ export const meta = {
                 },
                 {
                     "type": "hslider",
-                    "label": "res",
-                    "varname": "fHslider17",
-                    "shortname": "res",
-                    "address": "/fm/res",
-                    "index": 262404,
-                    "init": 1,
-                    "min": 0.01,
-                    "max": 100,
-                    "step": 0.01
-                },
-                {
-                    "type": "hslider",
                     "label": "s",
-                    "varname": "fHslider13",
+                    "varname": "fHslider10",
                     "shortname": "s",
                     "address": "/fm/s",
-                    "index": 262320,
+                    "index": 262276,
                     "init": 0.7,
                     "min": 0,
                     "max": 1,
