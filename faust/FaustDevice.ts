@@ -63,6 +63,31 @@ class FaustDevice {
         this.ready = true;
     }
 
+    async initEffectDevice(dspUrl: URL | string, meta: FaustMeta) {
+        const { FaustMonoDspGenerator } = await import('@grame/faustwasm');
+
+        const dspBuffer = await fetch(dspUrl.toString()).then(r => r.arrayBuffer());
+
+        const generator = new FaustMonoDspGenerator();
+        generator.factory = {
+            module: dspBuffer,
+            json: JSON.stringify(meta),
+        };
+
+        const node = await generator.createNode(this.context, meta.name);
+        if (!node) throw new Error(`Failed to create Faust mono node for ${meta.name}`);
+
+        this.node = node;
+        this.params = this._buildParamList(meta);
+
+        // @ts-ignore
+        node.connect(this.output._gainNode._nativeAudioNode);
+        // @ts-ignore
+        if (node.numberOfInputs > 0) this.input._gainNode._nativeAudioNode.connect(node);
+
+        this.ready = true;
+    }
+
     private _buildParamList(meta: FaustMeta): string[] {
         const paths: string[] = [];
         const walk = (items: FaustUINode[]) => {
@@ -99,6 +124,10 @@ class FaustDevice {
 
     disconnect() {
         this.output.disconnect();
+    }
+
+    set(params: Dictionary, time: number) {
+        this.setParams(params, time)
     }
 
     setParams(params: Dictionary, time: number) {
