@@ -24,7 +24,7 @@ class BaseSynth extends FaustDevice {
         if (!this.ready) return;
 
         const ps = { ...this.defaults, ...params };
-        const { n, amp, nudge, dur } = ps;
+        const { n, amp, nudge, dur, lag = 10 } = ps;
 
         const eventId = Symbol();  // unique per note event
         this._notes.add(n)
@@ -33,11 +33,16 @@ class BaseSynth extends FaustDevice {
         const noteDelay = paramDelay + (nudge || 0) + 10;
 
         setTimeout(() => {
-            this.setParamValue('lagtime', 0);
             Object.entries(ps)
                 .sort(([a], [b]) => a.localeCompare(b))
                 .filter(([key]) => !!this.paramPath(key) && !['lag'].includes(key))
-                .forEach(([key, value]) => this.setParamValue(key, value));
+                .forEach(([key, value]) => {
+                    this.setParamValue(
+                        'lagtime', 
+                        ['n', 'amp'].includes(key) ? 1 : lag
+                    );
+                    this.setParamValue(key, value)
+                });
         }, paramDelay);
 
         setTimeout(() => {
