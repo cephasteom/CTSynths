@@ -39,6 +39,7 @@ class BaseSynth extends FaustDevice {
                 .forEach(([key, value]) => {
                     this.setParamValue(
                         'lagtime', 
+                        // freq and gain are per voice, everything else is per instrument, so we have to smooth
                         ['n', 'amp'].includes(key) ? 1 : lag
                     );
                     this.setParamValue(key, value)

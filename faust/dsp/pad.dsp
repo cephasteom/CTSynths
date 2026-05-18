@@ -4,9 +4,6 @@ import("stdfaust.lib");
 // detune: total spread in cents across all voices
 // drift:  per-voice slow random Hz offset amplitude
 
-// --- Polyphony controls (Faust poly naming convention) ---
-freq    = hslider("freq", 440, 20, 20000, 1);
-gain    = hslider("gain", 1, 0, 1, 0.01);
 gate    = button("gate");
 
 // --- VarLag (snap on gate rising edge) ---
@@ -14,6 +11,12 @@ lagtime      = hslider("lagtime", 0, 0, 10000, 1) * 0.001;
 gate_trigger = gate > gate';
 lagpole      = select2(gate_trigger, exp(-1.0 / max(lagtime * ma.SR, 1.0)), 0.0);
 varlag(x)    = x : si.smooth(lagpole);
+
+// --- Polyphony controls (Faust poly naming convention) ---
+freq    = varlag(hslider("freq", 440, 20, 20000, 1));
+gain    = hslider("gain", 1, 0, 1, 0.01);
+
+
 
 // --- Per-voice controls ---
 pan     = varlag(hslider("pan", 0.5, 0, 1, 0.01));
@@ -33,7 +36,7 @@ bpf     = varlag(hslider("bpfv", 0, 0, 1, 0.001));
 res     = varlag(hslider("resv", 0.01, 0, 1, 0.001));
 
 // --- Keyscaling ---
-nL      = ba.hz2midikey(varlag(freq));
+nL      = ba.hz2midikey(freq);
 ks      = (nL - 60.0) / 12.0;
 ksScale = pow(2.0, ks * -0.5);
 ampL    = gain * ksScale;
