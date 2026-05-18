@@ -8,6 +8,7 @@
         "/usr/share/faust/signals.lib",
         "/usr/share/faust/maths.lib",
         "/usr/share/faust/platform.lib",
+        "/usr/share/faust/basics.lib",
         "/usr/share/faust/noises.lib",
         "/usr/share/faust/filters.lib",
         "/usr/share/faust/delays.lib",
@@ -20,11 +21,26 @@
         "/usr/share/faust",
         "."
     ],
-    "size": 16548,
-    "code": "GPj7",
+    "size": 16616,
+    "code": "VDwf",
     "inputs": 2,
     "outputs": 2,
     "meta": [
+        {
+            "basics.lib/name": "Faust Basic Element Library"
+        },
+        {
+            "basics.lib/peakholder:author": "Dario Sanfilippo"
+        },
+        {
+            "basics.lib/peakholder:copyright": "Copyright (C) 2022 Dario Sanfilippo <sanfilippo.dario@gmail.com>"
+        },
+        {
+            "basics.lib/peakholder:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "basics.lib/version": "1.22.0"
+        },
         {
             "compile_options": "-lang wasm-i -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
         },
@@ -141,11 +157,23 @@
             "items": [
                 {
                     "type": "hslider",
+                    "label": "attackTime",
+                    "varname": "fHslider3",
+                    "shortname": "attackTime",
+                    "address": "/tape/attackTime",
+                    "index": 40,
+                    "init": 50,
+                    "min": 10,
+                    "max": 1000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
                     "label": "flutter",
-                    "varname": "fHslider4",
+                    "varname": "fHslider7",
                     "shortname": "flutter",
                     "address": "/tape/flutter",
-                    "index": 8268,
+                    "index": 8336,
                     "init": 0,
                     "min": 0,
                     "max": 1,
@@ -154,10 +182,10 @@
                 {
                     "type": "hslider",
                     "label": "hiss",
-                    "varname": "fHslider5",
+                    "varname": "fHslider8",
                     "shortname": "hiss",
                     "address": "/tape/hiss",
-                    "index": 8312,
+                    "index": 8380,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
@@ -189,11 +217,23 @@
                 },
                 {
                     "type": "hslider",
-                    "label": "sat",
+                    "label": "releaseTime",
                     "varname": "fHslider2",
+                    "shortname": "releaseTime",
+                    "address": "/tape/releaseTime",
+                    "index": 36,
+                    "init": 500,
+                    "min": 10,
+                    "max": 5000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "sat",
+                    "varname": "fHslider5",
                     "shortname": "sat",
                     "address": "/tape/sat",
-                    "index": 36,
+                    "index": 104,
                     "init": 0,
                     "min": 0,
                     "max": 1,
@@ -201,11 +241,23 @@
                 },
                 {
                     "type": "hslider",
+                    "label": "threshold",
+                    "varname": "fHslider4",
+                    "shortname": "threshold",
+                    "address": "/tape/threshold",
+                    "index": 92,
+                    "init": 0.01,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001
+                },
+                {
+                    "type": "hslider",
                     "label": "wow",
-                    "varname": "fHslider3",
+                    "varname": "fHslider6",
                     "shortname": "wow",
                     "address": "/tape/wow",
-                    "index": 8244,
+                    "index": 8312,
                     "init": 0,
                     "min": 0,
                     "max": 1,
@@ -214,10 +266,10 @@
                 {
                     "type": "hslider",
                     "label": "xtalk",
-                    "varname": "fHslider6",
+                    "varname": "fHslider9",
                     "shortname": "xtalk",
                     "address": "/tape/xtalk",
-                    "index": 8344,
+                    "index": 8412,
                     "init": 0,
                     "min": 0,
                     "max": 1,

@@ -8,7 +8,7 @@ class FTape extends FaustDevice {
         this.initEffectDevice(dspUrl, meta);
         this.defaults = {
             ftape: 0,
-            ftapehiss: 0,
+            ftapehiss: 0.05,
             ftapesat: .1,
             ftapewow: .1,
             ftapeflutter: .1,
