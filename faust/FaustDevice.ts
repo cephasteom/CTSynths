@@ -179,9 +179,9 @@ class FaustDevice {
     set(params: Dictionary, time: number) {
         if (!this.ready) return;
         if (this.prefix) {
-            this._setPrefixed(params);
+            this._setPrefixed({...this.defaults, ...params});
         } else {
-            this.setParams(params, time);
+            this.setParams({...this.defaults, ...params}, time);
         }
     }
 
