@@ -51,8 +51,11 @@ class FaustDevice {
         const processorName = `${meta.name}_poly`;
         const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
             if (alreadyRegistered) {
+                // @ts-ignore
                 if (!FaustPolyDspGenerator.gWorkletProcessors.has(this.context))
+                    // @ts-ignore
                     FaustPolyDspGenerator.gWorkletProcessors.set(this.context, new Set());
+                // @ts-ignore
                 FaustPolyDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
             }
             return generator.createNode(this.context, voices, meta.name);
@@ -92,8 +95,11 @@ class FaustDevice {
         const processorName = meta.name;
         const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
             if (alreadyRegistered) {
+                // @ts-ignore
                 if (!FaustMonoDspGenerator.gWorkletProcessors.has(this.context))
-                    FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
+                    // @ts-ignore
+                FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
+                // @ts-ignore
                 FaustMonoDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
             }
             return generator.createNode(this.context, meta.name);
