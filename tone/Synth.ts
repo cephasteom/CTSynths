@@ -5,7 +5,6 @@ class Synth extends ToneInstrument {
     constructor() {
         super(ToneSynth)
         this.defaults = { ...this.defaults }
-
         this.init()
     }
 }

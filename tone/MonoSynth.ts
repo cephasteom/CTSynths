@@ -5,7 +5,7 @@ class MonoSynth extends ToneInstrument {
     constructor() {
         super(ToneMonoSynth)
         this.defaults = {
-            ...this.defaults, osc: 2,
+            ...this.defaults, osc: 2, fila: 10
         }
         this.init()
     }

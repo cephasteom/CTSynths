@@ -16,7 +16,7 @@ class ToneInstrument {
     defaults: Record<string, any> = {
         n: 60, amp: 0.5, dur: 500, nudge: 0, pan: 0.5, vol: 1,
         a: 10, d: 100, s: 0.5, r: 500,
-        osc: 3,
+        osc: 0,
     }
 
     /** @hidden */

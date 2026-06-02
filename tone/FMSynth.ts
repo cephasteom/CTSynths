@@ -7,10 +7,10 @@ class FMSynth extends ToneInstrument {
         this.defaults = {
             ...this.defaults,
             harm: 1,
-            modi: 1,
+            modi: 0,
             modosc: 0,
-            osc: 3,
-            moda: 500, modd: 100, mods: 0.5, modr: 500,
+            osc: 0,
+            moda: 10, modd: 100, mods: 0.1, modr: 500,
         }
         this.init()
     }
