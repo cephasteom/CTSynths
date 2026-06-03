@@ -1,5 +1,5 @@
 import { getContext, Gain } from 'tone';
-import type { Destination } from 'tone';
+import { FaustPolyDspGenerator, FaustMonoDspGenerator } from '@grame/faustwasm';
 import type { FaustPolyAudioWorkletNode } from '@grame/faustwasm';
 import type { Dictionary } from '../types';
 import { dummy } from './utils';
@@ -10,9 +10,6 @@ interface FaustMeta {
     name: string;
     ui: FaustUINode[];
 }
-
-let faustWasm: Promise<typeof import('@grame/faustwasm')> | null = null;
-const getFaustWasm = () => (faustWasm ??= import('@grame/faustwasm'));
 
 const moduleCache = new Map<string, Promise<WebAssembly.Module>>();
 const getModule = (url: URL | string) => {
@@ -63,8 +60,6 @@ class FaustDevice {
     async initDevice(dspUrl: URL | string, mixerUrl: URL | string, meta: FaustMeta, voices = 8) {
         if(this.ready) return // already done
 
-        const { FaustPolyDspGenerator } = await getFaustWasm();
-
         const [dspModule, mixerModule] = await Promise.all([getModule(dspUrl), getModule(mixerUrl)]);
 
         const generator = new FaustPolyDspGenerator();
@@ -81,23 +76,11 @@ class FaustDevice {
             this.context,
             () => generator.createNode(this.context, voices, meta.name)
         );
-        if (!node) throw new Error(`Failed to create Faust node for ${meta.name}`);
-
-        this.node = node;
-        this.params = this._buildParamList(meta);
-
-        // @ts-ignore
-        node.connect(this.output._gainNode._nativeAudioNode);
-        // @ts-ignore
-        if (node.numberOfInputs > 0) this.input._gainNode._nativeAudioNode.connect(node);
-
-        this.ready = true;
+        this._finaliseDevice(node, meta);
     }
 
     async initEffectDevice(dspUrl: URL | string, meta: FaustMeta) {
         if(this.ready) return // already done
-
-        const { FaustMonoDspGenerator } = await getFaustWasm();
 
         const generator = new FaustMonoDspGenerator();
         generator.factory = {
@@ -120,17 +103,19 @@ class FaustDevice {
             this.context,
             () => generator.createNode(this.context, meta.name)
         );
-        if (!node) throw new Error(`Failed to create Faust mono node for ${meta.name}`);
+        // @ts-ignore
+        this._finaliseDevice(node, meta);
+    }
 
+    private _finaliseDevice(node: FaustPolyAudioWorkletNode | null | undefined, meta: FaustMeta) {
+        if (!node) throw new Error(`Failed to create Faust node for ${meta.name}`);
         // @ts-ignore
         this.node = node;
         this.params = this._buildParamList(meta);
-
         // @ts-ignore
         node.connect(this.output._gainNode._nativeAudioNode);
         // @ts-ignore
         if (node.numberOfInputs > 0) this.input._gainNode._nativeAudioNode.connect(node);
-
         this.ready = true;
     }
 
