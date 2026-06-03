@@ -14,6 +14,13 @@ interface FaustMeta {
 let faustWasm: Promise<typeof import('@grame/faustwasm')> | null = null;
 const getFaustWasm = () => (faustWasm ??= import('@grame/faustwasm'));
 
+const moduleCache = new Map<string, Promise<WebAssembly.Module>>();
+const getModule = (url: URL | string) => {
+    const key = url.toString();
+    if (!moduleCache.has(key)) moduleCache.set(key, fetch(key).then(r => r.arrayBuffer()).then(WebAssembly.compile));
+    return moduleCache.get(key)!;
+};
+
 class FaustDevice {
     defaults: Dictionary = {}
     prefix: string = ''   // e.g. 'fdist'; bare prefix → 'mix', prefix+tag → tag
@@ -35,16 +42,12 @@ class FaustDevice {
     async initDevice(dspUrl: URL | string, mixerUrl: URL | string, meta: FaustMeta, voices = 8) {
         const { FaustPolyDspGenerator } = await getFaustWasm();
 
-        const [dspBuffer, mixerBuffer] = await Promise.all([
-            fetch(dspUrl.toString()).then(r => r.arrayBuffer()),
-            fetch(mixerUrl.toString()).then(r => r.arrayBuffer()),
-        ]);
+        const [dspModule, mixerModule] = await Promise.all([getModule(dspUrl), getModule(mixerUrl)]);
 
         const voiceFactory = {
-            module: await WebAssembly.compile(dspBuffer),
+            module: dspModule,
             json: JSON.stringify(meta),
         };
-        const mixerModule = await WebAssembly.compile(mixerBuffer);
 
         const generator = new FaustPolyDspGenerator();
         // @ts-ignore — assign pre-compiled factories directly
@@ -81,11 +84,9 @@ class FaustDevice {
     async initEffectDevice(dspUrl: URL | string, meta: FaustMeta) {
         const { FaustMonoDspGenerator } = await getFaustWasm();
 
-        const dspBuffer = await fetch(dspUrl.toString()).then(r => r.arrayBuffer());
-
         const generator = new FaustMonoDspGenerator();
         generator.factory = {
-            module: await WebAssembly.compile(dspBuffer),
+            module: await getModule(dspUrl),
             json: JSON.stringify(meta),
             soundfiles: {},
             cfactory: 0,
