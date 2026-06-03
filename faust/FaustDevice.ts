@@ -21,9 +21,30 @@ const getModule = (url: URL | string) => {
     return moduleCache.get(key)!;
 };
 
+const initQueues = new Map<string, Promise<unknown>>();
+const queueInit = <T>(
+    processorName: string,
+    gWorkletProcessors: Map<AudioContext, Set<string>>,
+    context: AudioContext,
+    work: () => Promise<T>
+): Promise<T> => {
+    const tail = (initQueues.get(processorName) ?? Promise.resolve()).then(async () => {
+        const result = await work();
+
+        if (!gWorkletProcessors.has(context))
+            gWorkletProcessors.set(context, new Set());
+        gWorkletProcessors.get(context)!.add(processorName);
+
+        return result;
+    });
+
+    initQueues.set(processorName, tail.catch(() => {}));
+    return tail as Promise<T>;
+};
+
 class FaustDevice {
     defaults: Dictionary = {}
-    prefix: string = ''   // e.g. 'fdist'; bare prefix → 'mix', prefix+tag → tag
+    prefix: string = ''
     input: Gain
     output: Gain
     node!: FaustPolyAudioWorkletNode
@@ -40,41 +61,33 @@ class FaustDevice {
     }
 
     async initDevice(dspUrl: URL | string, mixerUrl: URL | string, meta: FaustMeta, voices = 8) {
+        if(this.ready) return // already done
+
         const { FaustPolyDspGenerator } = await getFaustWasm();
 
         const [dspModule, mixerModule] = await Promise.all([getModule(dspUrl), getModule(mixerUrl)]);
 
-        const voiceFactory = {
-            module: dspModule,
-            json: JSON.stringify(meta),
-        };
-
         const generator = new FaustPolyDspGenerator();
         // @ts-ignore — assign pre-compiled factories directly
-        generator.voiceFactory = voiceFactory;
+        generator.voiceFactory = { module: dspModule, json: JSON.stringify(meta) };
         generator.mixerModule = mixerModule;
 
         const processorName = `${meta.name}_poly`;
-        const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
-            if (alreadyRegistered) {
-                // @ts-ignore
-                if (!FaustPolyDspGenerator.gWorkletProcessors.has(this.context))
-                    // @ts-ignore
-                    FaustPolyDspGenerator.gWorkletProcessors.set(this.context, new Set());
-                // @ts-ignore
-                FaustPolyDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
-            }
-            return generator.createNode(this.context, voices, meta.name);
-        });
+
+        const node = await queueInit(
+            processorName,
+            // @ts-ignore
+            FaustPolyDspGenerator.gWorkletProcessors,
+            this.context,
+            () => generator.createNode(this.context, voices, meta.name)
+        );
         if (!node) throw new Error(`Failed to create Faust node for ${meta.name}`);
 
         this.node = node;
         this.params = this._buildParamList(meta);
 
-        // connect into the Tone.js signal chain
         // @ts-ignore
         node.connect(this.output._gainNode._nativeAudioNode);
-        // only connect input for processors (effects); synths have 0 audio inputs
         // @ts-ignore
         if (node.numberOfInputs > 0) this.input._gainNode._nativeAudioNode.connect(node);
 
@@ -82,6 +95,8 @@ class FaustDevice {
     }
 
     async initEffectDevice(dspUrl: URL | string, meta: FaustMeta) {
+        if(this.ready) return // already done
+
         const { FaustMonoDspGenerator } = await getFaustWasm();
 
         const generator = new FaustMonoDspGenerator();
@@ -97,17 +112,14 @@ class FaustDevice {
         };
 
         const processorName = meta.name;
-        const node = await FaustDevice._serialiseInit(processorName, async (alreadyRegistered) => {
-            if (alreadyRegistered) {
-                // @ts-ignore
-                if (!FaustMonoDspGenerator.gWorkletProcessors.has(this.context))
-                    // @ts-ignore
-                FaustMonoDspGenerator.gWorkletProcessors.set(this.context, new Set());
-                // @ts-ignore
-                FaustMonoDspGenerator.gWorkletProcessors.get(this.context)!.add(processorName);
-            }
-            return generator.createNode(this.context, meta.name);
-        });
+
+        const node = await queueInit(
+            processorName,
+            // @ts-ignore
+            FaustMonoDspGenerator.gWorkletProcessors,
+            this.context,
+            () => generator.createNode(this.context, meta.name)
+        );
         if (!node) throw new Error(`Failed to create Faust mono node for ${meta.name}`);
 
         // @ts-ignore
@@ -122,32 +134,6 @@ class FaustDevice {
         this.ready = true;
     }
 
-    // Serialises AudioWorklet processor registration per processorName.
-    // Concurrent calls for the same name are queued; each waits for the previous to
-    // finish so that gWorkletProcessors is populated before the next createNode runs.
-    // Both maps live on window to survive Vite HMR module re-evaluation.
-    private static _serialiseInit<T>(
-        processorName: string,
-        work: (alreadyRegistered: boolean) => Promise<T>
-    ): Promise<T> {
-        const gates: Map<string, Promise<unknown>> = ((window as any).__faustGates ??= new Map());
-        const registered: Set<string> = ((window as any).__faustRegistered ??= new Set());
-
-        const result = (gates.get(processorName) ?? Promise.resolve()).then(() => {
-            const alreadyRegistered = registered.has(processorName);
-            return work(alreadyRegistered).then(node => {
-                registered.add(processorName);
-                return node;
-            });
-        });
-
-        // Store the tail of the chain so the next caller queues behind this one.
-        // Suppress errors on the gate so a failed init doesn't permanently block the queue.
-        gates.set(processorName, result.catch(() => {}));
-
-        return result;
-    }
-
     private _buildParamList(meta: FaustMeta): string[] {
         const paths: string[] = [];
         const walk = (items: FaustUINode[]) => {
@@ -160,7 +146,6 @@ class FaustDevice {
         return paths;
     }
 
-    // Maps a short tag to its full Faust path (e.g. 'cutoff' → '/MySynth/cutoff').
     protected paramPath(tag: string): string | undefined {
         return this.params.find(p => p === `/${tag}` || p.endsWith(`/${tag}`));
     }
