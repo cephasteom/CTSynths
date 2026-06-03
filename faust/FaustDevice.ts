@@ -1,4 +1,4 @@
-import { context as toneContext, Gain } from 'tone';
+import { getContext, Gain } from 'tone';
 import type { Destination } from 'tone';
 import type { FaustPolyAudioWorkletNode } from '@grame/faustwasm';
 import type { Dictionary } from '../types';
@@ -11,6 +11,9 @@ interface FaustMeta {
     ui: FaustUINode[];
 }
 
+let faustWasm: Promise<typeof import('@grame/faustwasm')> | null = null;
+const getFaustWasm = () => (faustWasm ??= import('@grame/faustwasm'));
+
 class FaustDevice {
     defaults: Dictionary = {}
     prefix: string = ''   // e.g. 'fdist'; bare prefix → 'mix', prefix+tag → tag
@@ -19,7 +22,7 @@ class FaustDevice {
     node!: FaustPolyAudioWorkletNode
     ready = false
     // @ts-ignore
-    context: AudioContext = toneContext.rawContext._nativeAudioContext || toneContext.rawContext._context;
+    context: AudioContext = getContext().rawContext._nativeAudioContext || getContext().rawContext._context;
     params: string[] = []
 
     constructor() {
@@ -30,7 +33,7 @@ class FaustDevice {
     }
 
     async initDevice(dspUrl: URL | string, mixerUrl: URL | string, meta: FaustMeta, voices = 8) {
-        const { FaustPolyDspGenerator } = await import('@grame/faustwasm');
+        const { FaustPolyDspGenerator } = await getFaustWasm();
 
         const [dspBuffer, mixerBuffer] = await Promise.all([
             fetch(dspUrl.toString()).then(r => r.arrayBuffer()),
@@ -76,7 +79,7 @@ class FaustDevice {
     }
 
     async initEffectDevice(dspUrl: URL | string, meta: FaustMeta) {
-        const { FaustMonoDspGenerator } = await import('@grame/faustwasm');
+        const { FaustMonoDspGenerator } = await getFaustWasm();
 
         const dspBuffer = await fetch(dspUrl.toString()).then(r => r.arrayBuffer());
 
@@ -174,7 +177,7 @@ class FaustDevice {
         }, delay);
     }
 
-    connect(node: typeof Destination | Gain) {
+    connect(node: Gain) {
         this.output.connect(node);
     }
 
