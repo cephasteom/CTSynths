@@ -16,8 +16,6 @@ varlag(x)    = x : si.smooth(lagpole);
 freq    = varlag(hslider("freq", 440, 20, 20000, 1));
 gain    = hslider("gain", 1, 0, 1, 0.01);
 
-
-
 // --- Per-voice controls ---
 pan     = varlag(hslider("pan", 0.5, 0, 1, 0.01));
 detune  = varlag(hslider("detune", 30, 0, 200, 0.1));   // total spread in cents
