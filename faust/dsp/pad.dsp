@@ -68,30 +68,14 @@ with {
     panR        = sin(panAngle);
 };
 
-// Faust doesn't have a stereo fold-add, so we sum L and R channels separately.
-// Each voice(i,...) expression is shared by the compiler — both the L and R
-// extractions reference the same node, so the sawtooth runs once per voice.
-sumL = (voice(0, freq, detune) : _, !) +
-       (voice(1, freq, detune) : _, !) +
-       (voice(2, freq, detune) : _, !) +
-       (voice(3, freq, detune) : _, !) +
-       (voice(4, freq, detune) : _, !) +
-       (voice(5, freq, detune) : _, !) +
-       (voice(6, freq, detune) : _, !);
-
-sumR = (voice(0, freq, detune) : !, _) +
-       (voice(1, freq, detune) : !, _) +
-       (voice(2, freq, detune) : !, _) +
-       (voice(3, freq, detune) : !, _) +
-       (voice(4, freq, detune) : !, _) +
-       (voice(5, freq, detune) : !, _) +
-       (voice(6, freq, detune) : !, _);
+// par builds one expression tree — CSE shares each voice's saw across L and R
+supersaw = par(i, 7, voice(i, freq, detune)) :> _;
 
 // --- Master pan (Balance2 equivalent) ---
 // balance ∈ -1..1; attenuates opposite side linearly
 balance  = pan * 2.0 - 1.0;
-masterL  = sumL / 7.0 * max(0.0, 1.0 - balance) * env * ampL;
-masterR  = sumR / 7.0 * max(0.0, 1.0 + balance) * env * ampL;
+masterL  = supersaw / 7 * max(0.0, 1.0 - balance) * env * ampL * 0.5;
+masterR  = supersaw / 7 * max(0.0, 1.0 + balance) * env * ampL * 0.5;
 
 // --- Filters ---
 lpfFreq = max(20.0, min(19999.0, pow(20000.0, 1.0 - lpf) * pow(20.0, lpf)));
