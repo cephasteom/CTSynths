@@ -1,0 +1,221 @@
+{
+    "name": "kick",
+    "filename": "kick",
+    "version": "2.84.3",
+    "compile_options": "-lang wasm-e -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2",
+    "library_list": [
+        "/usr/share/faust/stdfaust.lib",
+        "/usr/share/faust/oscillators.lib",
+        "/usr/share/faust/envelopes.lib",
+        "/usr/share/faust/maths.lib",
+        "/usr/share/faust/platform.lib",
+        "/usr/share/faust/basics.lib",
+        "/usr/share/faust/signals.lib"
+    ],
+    "include_pathnames": [
+        "/faust/user/inc0",
+        "/share/faust",
+        "/usr/local/share/faust",
+        "/usr/share/faust",
+        "."
+    ],
+    "size": 262284,
+    "code": "uLPY",
+    "inputs": 0,
+    "outputs": 2,
+    "meta": [
+        {
+            "basics.lib/name": "Faust Basic Element Library"
+        },
+        {
+            "basics.lib/version": "1.22.0"
+        },
+        {
+            "compile_options": "-lang wasm-e -fpga-mem-th 4 -ct 1 -es 1 -mcd 16 -mdd 1024 -mdy 33 -single -ftz 2"
+        },
+        {
+            "envelopes.lib/adsr:author": "Yann Orlarey and Andrey Bundin"
+        },
+        {
+            "envelopes.lib/ar:author": "Yann Orlarey, Stéphane Letz"
+        },
+        {
+            "envelopes.lib/author": "GRAME"
+        },
+        {
+            "envelopes.lib/copyright": "GRAME"
+        },
+        {
+            "envelopes.lib/license": "LGPL with exception"
+        },
+        {
+            "envelopes.lib/name": "Faust Envelope Library"
+        },
+        {
+            "envelopes.lib/version": "1.3.0"
+        },
+        {
+            "filename": "kick"
+        },
+        {
+            "maths.lib/author": "GRAME"
+        },
+        {
+            "maths.lib/copyright": "GRAME"
+        },
+        {
+            "maths.lib/license": "LGPL with exception"
+        },
+        {
+            "maths.lib/name": "Faust Math Library"
+        },
+        {
+            "maths.lib/version": "2.9.0"
+        },
+        {
+            "name": "kick"
+        },
+        {
+            "oscillators.lib/name": "Faust Oscillator Library"
+        },
+        {
+            "oscillators.lib/version": "1.7.0"
+        },
+        {
+            "platform.lib/name": "Generic Platform Library"
+        },
+        {
+            "platform.lib/version": "1.3.0"
+        },
+        {
+            "signals.lib/name": "Faust Signal Routing Library"
+        },
+        {
+            "signals.lib/version": "1.6.0"
+        }
+    ],
+    "ui": [
+        {
+            "type": "vgroup",
+            "label": "kick",
+            "items": [
+                {
+                    "type": "hslider",
+                    "label": "a",
+                    "varname": "fHslider3",
+                    "shortname": "a",
+                    "address": "/kick/a",
+                    "index": 262220,
+                    "init": 1,
+                    "min": 0,
+                    "max": 500,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "d",
+                    "varname": "fHslider5",
+                    "shortname": "d",
+                    "address": "/kick/d",
+                    "index": 262236,
+                    "init": 400,
+                    "min": 0,
+                    "max": 5000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "freq",
+                    "varname": "fHslider1",
+                    "shortname": "freq",
+                    "address": "/kick/freq",
+                    "index": 262148,
+                    "init": 60,
+                    "min": 20,
+                    "max": 500,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "gain",
+                    "varname": "fHslider0",
+                    "shortname": "gain",
+                    "address": "/kick/gain",
+                    "index": 262144,
+                    "init": 1,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "button",
+                    "label": "gate",
+                    "varname": "fButton0",
+                    "shortname": "gate",
+                    "address": "/kick/gate",
+                    "index": 262188
+                },
+                {
+                    "type": "hslider",
+                    "label": "lagtime",
+                    "varname": "fHslider8",
+                    "shortname": "lagtime",
+                    "address": "/kick/lagtime",
+                    "index": 262256,
+                    "init": 0,
+                    "min": 0,
+                    "max": 10000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "pan",
+                    "varname": "fHslider7",
+                    "shortname": "pan",
+                    "address": "/kick/pan",
+                    "index": 262252,
+                    "init": 0.5,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "punch",
+                    "varname": "fHslider2",
+                    "shortname": "punch",
+                    "address": "/kick/punch",
+                    "index": 262172,
+                    "init": 0.4,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                },
+                {
+                    "type": "hslider",
+                    "label": "r",
+                    "varname": "fHslider6",
+                    "shortname": "r",
+                    "address": "/kick/r",
+                    "index": 262240,
+                    "init": 100,
+                    "min": 0,
+                    "max": 2000,
+                    "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "s",
+                    "varname": "fHslider4",
+                    "shortname": "s",
+                    "address": "/kick/s",
+                    "index": 262232,
+                    "init": 0,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                }
+            ]
+        }
+    ]
+}
