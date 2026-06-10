@@ -9,11 +9,14 @@ export const meta = {
     "library_list": [
         "/usr/share/faust/stdfaust.lib",
         "/usr/share/faust/oscillators.lib",
-        "/usr/share/faust/envelopes.lib",
-        "/usr/share/faust/maths.lib",
-        "/usr/share/faust/platform.lib",
         "/usr/share/faust/basics.lib",
-        "/usr/share/faust/signals.lib"
+        "/usr/share/faust/maths.lib",
+        "/usr/share/faust/envelopes.lib",
+        "/usr/share/faust/platform.lib",
+        "/usr/share/faust/filters.lib",
+        "/usr/share/faust/noises.lib",
+        "/usr/share/faust/signals.lib",
+        "/usr/share/faust/routes.lib"
     ],
     "include_pathnames": [
         "/faust/user/inc0",
@@ -22,8 +25,8 @@ export const meta = {
         "/usr/share/faust",
         "."
     ],
-    "size": 262284,
-    "code": "uLPY",
+    "size": 262320,
+    "code": "SOr5",
     "inputs": 0,
     "outputs": 2,
     "meta": [
@@ -61,6 +64,24 @@ export const meta = {
             "filename": "kick"
         },
         {
+            "filters.lib/lowpass0_highpass1": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/name": "Faust Filters Library"
+        },
+        {
+            "filters.lib/svf:author": "Oleg Nesterov"
+        },
+        {
+            "filters.lib/svf:copyright": "Copyright (C) 2020 Oleg Nesterov <oleg@redhat.com>"
+        },
+        {
+            "filters.lib/svf:license": "MIT-style STK-4.3 license"
+        },
+        {
+            "filters.lib/version": "1.7.1"
+        },
+        {
             "maths.lib/author": "GRAME"
         },
         {
@@ -79,6 +100,12 @@ export const meta = {
             "name": "kick"
         },
         {
+            "noises.lib/name": "Faust Noise Generator Library"
+        },
+        {
+            "noises.lib/version": "1.5.0"
+        },
+        {
             "oscillators.lib/name": "Faust Oscillator Library"
         },
         {
@@ -89,6 +116,12 @@ export const meta = {
         },
         {
             "platform.lib/version": "1.3.0"
+        },
+        {
+            "routes.lib/name": "Faust Signal Routing Library"
+        },
+        {
+            "routes.lib/version": "1.2.0"
         },
         {
             "signals.lib/name": "Faust Signal Routing Library"
@@ -113,6 +146,18 @@ export const meta = {
                     "min": 0,
                     "max": 500,
                     "step": 1
+                },
+                {
+                    "type": "hslider",
+                    "label": "click",
+                    "varname": "fHslider7",
+                    "shortname": "click",
+                    "address": "/kick/click",
+                    "index": 262252,
+                    "init": 0.4,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
                 },
                 {
                     "type": "hslider",
@@ -161,10 +206,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "lagtime",
-                    "varname": "fHslider8",
+                    "varname": "fHslider9",
                     "shortname": "lagtime",
                     "address": "/kick/lagtime",
-                    "index": 262256,
+                    "index": 262292,
                     "init": 0,
                     "min": 0,
                     "max": 10000,
@@ -173,10 +218,10 @@ export const meta = {
                 {
                     "type": "hslider",
                     "label": "pan",
-                    "varname": "fHslider7",
+                    "varname": "fHslider8",
                     "shortname": "pan",
                     "address": "/kick/pan",
-                    "index": 262252,
+                    "index": 262288,
                     "init": 0.5,
                     "min": 0,
                     "max": 1,
