@@ -49,6 +49,7 @@ class FaustDevice {
     // @ts-ignore
     context: AudioContext = getContext().rawContext._nativeAudioContext || getContext().rawContext._context;
     params: string[] = []
+    history: Record<string, any> = {}
 
     constructor() {
         this.input = new Gain(1);
@@ -137,16 +138,20 @@ class FaustDevice {
 
     setParamValue(tag: string, value: number) {
         const path = this.paramPath(tag);
-        if (path) this.node.setParamValue(path, value);
+        // reduce network traffic
+        if (path && this.history[tag] !== value) {
+            this.node.setParamValue(tag, value);
+            this.history[tag] = value
+        }
     }
 
-    messageDevice(tag: string, value: number, time: number) {
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000);
-        this.setParamValue('lagtime', 10);
-        setTimeout(() => {
-            this.setParamValue(tag, value)
-        }, delay);
-    }
+    // messageDevice(tag: string, value: number, time: number) {
+    //     const delay = Math.max(0, (time - this.context.currentTime) * 1000);
+    //     this.setParamValue('lagtime', 10);
+    //     setTimeout(() => {
+    //         this.setParamValue(tag, value)
+    //     }, delay);
+    // }
 
     connect(node: Gain) {
         this.output.connect(node);
