@@ -67,7 +67,7 @@ with {
 };
 
 // par builds one expression tree — CSE shares each voice's saw across L and R
-supersaw = par(i, 7, voice(i, freq, detune)) :> _;
+supersaw = par(i, 4, voice(i, freq, detune)) :> _;
 
 // --- Master pan (Balance2 equivalent) ---
 // balance ∈ -1..1; attenuates opposite side linearly
