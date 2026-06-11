@@ -145,14 +145,6 @@ class FaustDevice {
         }
     }
 
-    // messageDevice(tag: string, value: number, time: number) {
-    //     const delay = Math.max(0, (time - this.context.currentTime) * 1000);
-    //     this.setParamValue('lagtime', 10);
-    //     setTimeout(() => {
-    //         this.setParamValue(tag, value)
-    //     }, delay);
-    // }
-
     connect(node: Gain) {
         this.output.connect(node);
     }
