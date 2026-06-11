@@ -51,6 +51,7 @@ class BaseSynth extends FaustDevice {
             const id = setTimeout(() => {
                 if(this._releaseTimers.has(eventId)) {
                     this.node.keyOff(0, n, 0);
+                    this._notes.delete(eventId)
                     this._releaseTimers.delete(eventId);
                 }
             }, dur);
@@ -60,13 +61,14 @@ class BaseSynth extends FaustDevice {
 
     cut(time: number, ms: number = 5): void {
         if (!this.ready) return;
-        const delay = Math.max(0, (time - this.context.currentTime) * 1000) + 1;
+        const delay = Math.max(0, (time - this.context.currentTime) * 1000) - 5;
 
         this._releaseTimers.forEach(id => clearTimeout(id));
         this._releaseTimers.clear();
         setTimeout(() => {
             this.setParamValue('r', ms);
             this._notes.forEach(n => this.node.keyOff(0, n, 0))
+            this._notes.clear()
         }, delay);
     }
 

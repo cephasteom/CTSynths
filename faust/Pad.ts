@@ -2,7 +2,7 @@ import BaseSynth from './BaseSynth';
 import { dspUrl, mixerUrl, meta } from './wasm/pad/index';
 
 class Pad extends BaseSynth {
-    constructor(voices = 32) {
+    constructor(voices = 8) {
         super();
         this.initDevice(dspUrl, mixerUrl, meta, voices);
         this.defaults = { ...this.defaults, 

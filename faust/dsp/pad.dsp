@@ -48,7 +48,7 @@ env     = en.adsr(a, d, s, r, gate);
 centsRatio(c) = pow(2.0, c / 1200.0);
 
 // Slow per-voice drift LFO — spread rates 0.1..0.5 Hz across voices
-driftHz(rate) = no.lfnoiseN(1, rate) * drift;
+driftHz(rate) = no.lfnoiseN(1,rate) * drift;
 
 // One voice → (L sample, R sample)
 // pos maps i ∈ 0..6 linearly to -1..1
